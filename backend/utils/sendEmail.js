@@ -10,7 +10,7 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: `"BiteStream Food" <${process.env.EMAIL_USER}>`,
+        from: `"Antigravity Food" <${process.env.EMAIL_USER}>`,
         to: options.email,
         subject: options.subject,
         html: options.html
