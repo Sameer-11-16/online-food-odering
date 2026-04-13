@@ -12,7 +12,7 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: `"Antigravity Food" <${process.env.BREVO_USER}>`,
+        from: `"Antigravity Food" <sameeransari000009@gmail.com>`,
         to: options.email,
         subject: options.subject,
         html: options.html,
