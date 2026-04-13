@@ -24,7 +24,7 @@ const sendOTP = async (req, res) => {
             { upsert: true, new: true }
         );
 
-        // Send Email
+        // Send Email via Brevo
         await sendEmail({
             email,
             subject: 'Your Registration OTP - Antigravity Food',
