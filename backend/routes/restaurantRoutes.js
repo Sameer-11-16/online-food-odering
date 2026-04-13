@@ -1,0 +1,19 @@
+const express = require('express');
+const router = express.Router();
+const {
+    getRestaurants,
+    getRestaurantById,
+    getRestaurantMenu,
+    createRestaurant,
+    createMenuItem,
+    deleteMenuItem,
+    updateRestaurant,
+} = require('../controllers/restaurantController');
+const { protect } = require('../middleware/authMiddleware');
+
+router.route('/').get(getRestaurants).post(protect, createRestaurant);
+router.route('/:id').get(getRestaurantById).put(protect, updateRestaurant);
+router.route('/:id/menu').get(getRestaurantMenu).post(protect, createMenuItem);
+router.route('/:id/menu/:menuId').delete(protect, deleteMenuItem);
+
+module.exports = router;
