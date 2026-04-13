@@ -24,8 +24,8 @@ const sendOTP = async (req, res) => {
             { upsert: true, new: true }
         );
 
-        // Send Email
-        await sendEmail({
+        // Send Email (Don't await to make it feel fast)
+        sendEmail({
             email,
             subject: 'Your Registration OTP - Antigravity Food',
             html: `
@@ -38,7 +38,7 @@ const sendOTP = async (req, res) => {
                     <p style="margin-top: 20px; font-size: 14px; color: #747d8c;">This OTP will expire in 5 minutes. If you did not request this, please ignore this email.</p>
                 </div>
             `
-        });
+        }).catch(err => console.error('BG Email Error:', err));
 
         res.json({ message: 'OTP sent to your email' });
     } catch (error) {
