@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
+import API_BASE_URL from "./apiConfig";
 
-const SOCKET_URL = "/"; // Adjust to your backend URL
+const SOCKET_URL = API_BASE_URL;
 
 export const socket = io(SOCKET_URL, {
     autoConnect: true,
