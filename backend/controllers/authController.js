@@ -17,8 +17,6 @@ const sendOTP = async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
-        console.log(`[OTP] Generated for ${email}: ${otp}`);
-
         // Save OTP to DB
         await OTP.findOneAndUpdate(
             { email },
@@ -26,9 +24,7 @@ const sendOTP = async (req, res) => {
             { upsert: true, returnDocument: 'after' }
         );
 
-        console.log(`[Brevo] Attempting to send email to ${email}...`);
-
-        // Send Email via Brevo
+        // Send Email via Brevo API
         await sendEmail({
             email,
             subject: 'Your Registration OTP - BiteStream',
@@ -39,22 +35,17 @@ const sendOTP = async (req, res) => {
                     <div style="background: #f1f2f6; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #2f3542; border-radius: 5px;">
                         ${otp}
                     </div>
-                    <p style="margin-top: 20px; font-size: 14px; color: #747d8c;">This OTP will expire in 5 minutes.</p>
                 </div>
             `
         });
 
-        console.log(`[Brevo] Success! OTP email sent to ${email}`);
         res.json({ message: 'OTP sent to your email' });
     } catch (error) {
-        console.error(`[Brevo] Error sending OTP to ${email}:`, error.message);
-        res.status(500).json({ message: `Mail Error: ${error.message}` });
+        res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Register a new user with OTP
-// @route   POST /api/auth/register
-// @access  Public
+// @desc    Register a new user
 const registerUser = async (req, res) => {
     const { name, email, password, role, phone, otp } = req.body;
 
@@ -64,28 +55,15 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Verify OTP
         const otpRecord = await OTP.findOne({ email });
-        if (!otpRecord) {
-            return res.status(400).json({ message: 'OTP expired. Please request a new one.' });
-        }
-        
-        if (otpRecord.otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP' });
+        if (!otpRecord || otpRecord.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        const user = await User.create({
-            name,
-            email,
-            password,
-            role,
-            phone,
-        });
+        const user = await User.create({ name, email, password, role, phone });
 
         if (user) {
-            // Delete OTP after successful registration
             await OTP.deleteOne({ email });
-
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
@@ -94,8 +72,6 @@ const registerUser = async (req, res) => {
                 phone: user.phone,
                 token: generateToken(user._id),
             });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -103,14 +79,10 @@ const registerUser = async (req, res) => {
 };
 
 // @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
 const authUser = async (req, res) => {
     const { email, password } = req.body;
-
     try {
         const user = await User.findOne({ email });
-
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
