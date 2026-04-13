@@ -5,7 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy
 
 router.post('/create-payment-intent', async (req, res) => {
     try {
-        const { items, totalPrice } = req.body;
+        const { totalPrice } = req.body;
         
         // Stripe expects the amount in the smallest currency unit (e.g., cents or paise)
         // Since we are using Indian Rupees (₹), 1 INR = 100 paise

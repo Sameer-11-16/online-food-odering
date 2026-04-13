@@ -8,7 +8,6 @@ const orderRoutes = require('./routes/orderRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-const path = require('path');
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -39,8 +38,6 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/stripe', paymentRoutes);
 app.use('/api/users', require('./routes/userRoutes'));
-
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.get('/', (req, res) => {
     res.send('API is running...');
