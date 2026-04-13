@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import axios from 'axios'
 import API_BASE_URL from './apiConfig'
+import reportWebVitals from './reportWebVitals'
 
 axios.defaults.baseURL = API_BASE_URL;
 
@@ -21,3 +22,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </ThemeProvider>
   </React.StrictMode>,
 )
+
+// Measure performance
+reportWebVitals(console.log);
