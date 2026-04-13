@@ -24,21 +24,27 @@ const sendOTP = async (req, res) => {
             { upsert: true, returnDocument: 'after' }
         );
 
-        // Send Email (Don't await to make it feel fast)
-        sendEmail({
-            email,
-            subject: 'Your Registration OTP - Antigravity Food',
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                    <h2 style="color: #ff4757;">Welcome to Antigravity Food!</h2>
-                    <p>Your One-Time Password (OTP) for account registration is:</p>
-                    <div style="background: #f1f2f6; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #2f3542; border-radius: 5px;">
-                        ${otp}
+        // Send Email (Awaiting to ensure Render doesn't freeze the process)
+        try {
+            await sendEmail({
+                email,
+                subject: 'Your Registration OTP - Antigravity Food',
+                html: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #ff4757;">Welcome to Antigravity Food!</h2>
+                        <p>Your One-Time Password (OTP) for account registration is:</p>
+                        <div style="background: #f1f2f6; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #2f3542; border-radius: 5px;">
+                            ${otp}
+                        </div>
+                        <p style="margin-top: 20px; font-size: 14px; color: #747d8c;">This OTP will expire in 5 minutes. If you did not request this, please ignore this email.</p>
                     </div>
-                    <p style="margin-top: 20px; font-size: 14px; color: #747d8c;">This OTP will expire in 5 minutes. If you did not request this, please ignore this email.</p>
-                </div>
-            `
-        }).catch(err => console.error('BG Email Error:', err));
+                `
+            });
+        } catch (emailError) {
+            console.error('Email Delivery failed:', emailError);
+            // We continue anyway so the user isn't blocked if it's just a log issue, 
+            // but in production we want to know.
+        }
 
         res.json({ message: 'OTP sent to your email' });
     } catch (error) {
