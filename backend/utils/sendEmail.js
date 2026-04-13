@@ -3,7 +3,6 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    family: 4, // Force IPv4
     secure: false, // Use STARTTLS
     auth: {
         user: process.env.EMAIL_USER,
@@ -11,6 +10,10 @@ const transporter = nodemailer.createTransport({
     },
     tls: {
         rejectUnauthorized: false
+    },
+    // Master Override: Force DNS to only use IPv4
+    lookup: (hostname, options, callback) => {
+        require('dns').lookup(hostname, { family: 4 }, callback);
     }
 });
 
