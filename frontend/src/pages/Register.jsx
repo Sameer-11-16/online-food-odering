@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ChevronDown, UserPlus } from 'lucide-react';
+import { ChevronDown, UserPlus, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -11,19 +11,45 @@ const Register = () => {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('customer');
+    const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [sendOtpLoading, setSendOtpLoading] = useState(false);
     const [error, setError] = useState('');
     
     const navigate = useNavigate();
     const { login } = useAuth();
 
+    const sendOtpHandler = async () => {
+        if (!email) {
+            toast.error('Please enter your email first');
+            return;
+        }
+        setError('');
+        setSendOtpLoading(true);
+        try {
+            await axios.post('/api/auth/send-otp', { email });
+            setOtpSent(true);
+            toast.success('OTP sent to your email!');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to send OTP');
+            toast.error(err.response?.data?.message || 'Failed to send OTP');
+        } finally {
+            setSendOtpLoading(false);
+        }
+    };
+
     const registerHandler = async (e) => {
         e.preventDefault();
+        if (!otpSent) {
+            toast.error('Please verify your email with OTP first');
+            return;
+        }
         setError('');
         setLoading(true);
         try {
             const { data } = await axios.post('/api/auth/register', { 
-                name, email, phone, password, role
+                name, email, phone, password, role, otp
             });
             login(data);
             toast.success('Account created successfully!');
@@ -57,10 +83,29 @@ const Register = () => {
                         <label className="input-label">Full Name</label>
                         <input type="text" className="input-glass" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
-                    <div className="input-group">
+                    <div className="input-group" style={{ marginBottom: '10px' }}>
                         <label className="input-label">Email Address</label>
-                        <input type="email" className="input-glass" placeholder="hello@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <input type="email" className="input-glass" placeholder="hello@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={otpSent} />
+                            <button 
+                                type="button" 
+                                onClick={sendOtpHandler} 
+                                disabled={sendOtpLoading || otpSent} 
+                                className="btn btn-primary" 
+                                style={{ padding: '0 15px', fontSize: '0.85rem', flexShrink: 0 }}
+                            >
+                                {sendOtpLoading ? '...' : otpSent ? 'Sent' : 'Send OTP'}
+                            </button>
+                        </div>
                     </div>
+
+                    {otpSent && (
+                        <div className="input-group" style={{ animation: 'fadeIn 0.5s ease' }}>
+                            <label className="input-label">OTP Code</label>
+                            <input type="text" className="input-glass" placeholder="Enter 6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
+                        </div>
+                    )}
+
                     <div className="input-group">
                         <label className="input-label">Phone Number</label>
                         <input type="tel" className="input-glass" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} required />
@@ -92,3 +137,4 @@ const Register = () => {
 };
 
 export default Register;
+
