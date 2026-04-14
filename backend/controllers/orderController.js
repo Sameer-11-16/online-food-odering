@@ -6,8 +6,12 @@ const Order = require('../models/Order');
 const addOrderItems = async (req, res) => {
     const { orderItems, shippingAddress, paymentMethod, totalPrice, restaurant } = req.body;
 
+    console.log('Incoming Order Data:', { restaurant, itemCount: orderItems?.length, totalPrice });
+
     if (orderItems && orderItems.length === 0) {
         return res.status(400).json({ message: 'No order items' });
+    } else if (!restaurant) {
+        return res.status(400).json({ message: 'Restaurant ID is required' });
     } else {
         try {
             const order = new Order({
@@ -23,16 +27,18 @@ const addOrderItems = async (req, res) => {
             
             // Notify the restaurant about the new order
             const io = req.app.get('socketio');
-            if (io) {
+            if (io && restaurant) {
                 io.to(restaurant.toString()).emit('newOrder', createdOrder);
             }
 
             res.status(201).json(createdOrder);
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Order Creation Error:', error);
+            res.status(500).json({ message: error.message || 'Order creation failed' });
         }
     }
 };
+
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
