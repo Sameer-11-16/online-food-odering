@@ -29,8 +29,28 @@ const AppContent = () => {
     if (userInfo) {
       socket.connect();
       socket.emit('join', userInfo._id);
+
+      socket.on('orderStatusUpdate', (order) => {
+        toast.success(`Order Status: ${order.status}`, {
+          icon: '🍕',
+          duration: 6000,
+          style: { background: 'var(--secondary)', color: 'white' }
+        });
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3').play().catch(e => {});
+      });
+
+      socket.on('reservationStatusUpdate', (res) => {
+        toast(`Reservation ${res.status}`, {
+          icon: '📅',
+          duration: 6000,
+          style: { background: 'var(--primary)', color: 'white' }
+        });
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3').play().catch(e => {});
+      });
       
       return () => {
+        socket.off('orderStatusUpdate');
+        socket.off('reservationStatusUpdate');
         socket.disconnect();
       };
     }

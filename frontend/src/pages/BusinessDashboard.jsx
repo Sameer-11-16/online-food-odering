@@ -37,6 +37,13 @@ const BusinessDashboard = () => {
     // Orders and Reservations
     const [orders, setOrders] = useState([]);
     const [reservations, setReservations] = useState([]);
+    const [manualBookingForm, setManualBookingForm] = useState(false);
+    const [manualResName, setManualResName] = useState('');
+    const [manualResPhone, setManualResPhone] = useState('');
+    const [manualResDate, setManualResDate] = useState('');
+    const [manualResTime, setManualResTime] = useState('');
+    const [manualResGuests, setManualResGuests] = useState(2);
+    const [manualResRequests, setManualResRequests] = useState('');
 
     useEffect(() => {
         if (!userInfo || userInfo.role !== 'restaurant_owner') {
@@ -193,6 +200,33 @@ const BusinessDashboard = () => {
             toast.success('Reservation status updated');
         } catch (err) {
             toast.error('Failed to update reservation');
+        }
+    };
+
+    const handleManualBooking = async (e) => {
+        e.preventDefault();
+        try {
+            const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            await axios.post('/api/reservations', {
+                restaurant: restaurant._id,
+                date: manualResDate,
+                time: manualResTime,
+                guests: manualResGuests,
+                specialRequests: manualResRequests,
+                guestName: manualResName,
+                guestPhone: manualResPhone,
+                isOffline: true
+            }, config);
+            
+            toast.success('Offline booking created!');
+            setManualBookingForm(false);
+            setManualResName(''); setManualResPhone(''); setManualResDate(''); setManualResTime('');
+            
+            // Refresh reservations
+            const { data: resData } = await axios.get(`/api/reservations/restaurant/${restaurant._id}`, config);
+            setReservations(resData);
+        } catch (error) {
+            toast.error('Failed to create offline booking');
         }
     };
 
@@ -459,7 +493,54 @@ const BusinessDashboard = () => {
 
                             {activeTab === 'reservations' && (
                                 <motion.div key="reservations" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
-                                    <h3 style={{ fontSize: '1.4rem', marginBottom: '20px' }}>Table Reservations</h3>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+                                        <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Table Reservations</h3>
+                                        <button onClick={() => setManualBookingForm(!manualBookingForm)} className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>
+                                            {manualBookingForm ? 'Close Form' : '+ Add Offline Booking'}
+                                        </button>
+                                    </div>
+
+                                    <AnimatePresence>
+                                        {manualBookingForm && (
+                                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden', marginBottom: '30px' }}>
+                                                <div className="glass-panel" style={{ padding: '30px', background: 'var(--glass-accent-light)', border: '1px solid var(--primary)' }}>
+                                                    <h4 style={{ marginBottom: '20px', fontSize: '1.1rem', fontWeight: 700 }}>New Manual Reservation</h4>
+                                                    <form onSubmit={handleManualBooking}>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                                            <div className="input-group">
+                                                                <label className="input-label">Customer Name</label>
+                                                                <input type="text" className="input-glass" required value={manualResName} onChange={e => setManualResName(e.target.value)} placeholder="e.g. Rahul Sharma" />
+                                                            </div>
+                                                            <div className="input-group">
+                                                                <label className="input-label">Phone Number</label>
+                                                                <input type="tel" className="input-glass" required value={manualResPhone} onChange={e => setManualResPhone(e.target.value)} placeholder="+91..." />
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                                            <div className="input-group">
+                                                                <label className="input-label">Date</label>
+                                                                <input type="date" className="input-glass" required value={manualResDate} onChange={e => setManualResDate(e.target.value)} />
+                                                            </div>
+                                                            <div className="input-group">
+                                                                <label className="input-label">Time</label>
+                                                                <input type="time" className="input-glass" required value={manualResTime} onChange={e => setManualResTime(e.target.value)} />
+                                                            </div>
+                                                            <div className="input-group">
+                                                                <label className="input-label">Guests</label>
+                                                                <input type="number" className="input-glass" required min="1" value={manualResGuests} onChange={e => setManualResGuests(e.target.value)} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="input-group">
+                                                            <label className="input-label">Special requests / Table No.</label>
+                                                            <input type="text" className="input-glass" value={manualResRequests} onChange={e => setManualResRequests(e.target.value)} placeholder="Window seat, Birthday cake, etc." />
+                                                        </div>
+                                                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Confirm Booking</button>
+                                                    </form>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
                                         {reservations.length === 0 ? <p style={{ color: 'var(--text-secondary)' }}>There are no table bookings at this time.</p> : reservations.map(res => (
                                             <div key={res._id} style={{ background: 'var(--glass-accent)', border: '1px solid var(--glass-border)', padding: '24px', borderRadius: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)' }}>
@@ -469,8 +550,9 @@ const BusinessDashboard = () => {
                                                 </div>
                                                 <div style={{ marginBottom: '16px' }}>
                                                     <p style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px' }}>{res.guests} Guests</p>
-                                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Name: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{res.user?.name}</span></p>
-                                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Phone: <span style={{ color: 'var(--text-primary)' }}>{res.user?.phone || 'N/A'}</span></p>
+                                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Name: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{res.guestName || res.user?.name}</span></p>
+                                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Phone: <span style={{ color: 'var(--text-primary)' }}>{res.guestPhone || res.user?.phone || 'N/A'}</span></p>
+                                                    {res.guestName && <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,165,2,0.1)', color: 'var(--accent)', fontWeight: 800, verticalAlign: 'middle', marginLeft: '8px' }}>OFFLINE</span>}
                                                 </div>
                                                 {res.specialRequests && <div style={{ background: 'rgba(255, 165, 2, 0.1)', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}><p style={{ fontSize: '0.85rem', color: 'var(--accent)', fontStyle: 'italic' }}>"{res.specialRequests}"</p></div>}
                                                 

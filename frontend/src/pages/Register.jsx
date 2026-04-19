@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ChevronDown, UserPlus, Send } from 'lucide-react';
+import { UserPlus, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -114,13 +114,12 @@ const Register = () => {
                         <label className="input-label">Password</label>
                         <input type="password" className="input-glass" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
-                    <div className="input-group" style={{ position: 'relative' }}>
+                    <div className="input-group">
                         <label className="input-label">Account Type</label>
-                        <select className="input-glass" style={{ appearance: 'none' }} value={role} onChange={(e) => setRole(e.target.value)} required>
+                        <select className="input-glass" value={role} onChange={(e) => setRole(e.target.value)} required>
                             <option value="customer">Hungry Customer</option>
                             <option value="restaurant_owner">Restaurant Owner</option>
                         </select>
-                        <ChevronDown size={18} style={{ position: 'absolute', right: '16px', top: '40px', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
                     </div>
                     
                     <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', marginTop: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>

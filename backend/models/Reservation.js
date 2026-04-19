@@ -3,8 +3,16 @@ const mongoose = require('mongoose');
 const reservationSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: 'User',
+    },
+    guestName: {
+        type: String,
+        required: function() { return !this.user; }
+    },
+    guestPhone: {
+        type: String,
+        required: function() { return !this.user; }
     },
     restaurant: {
         type: mongoose.Schema.Types.ObjectId,

@@ -5,17 +5,25 @@ const Reservation = require('../models/Reservation');
 // @access  Private
 const createReservation = async (req, res) => {
     try {
-        const { restaurant, date, time, guests, specialRequests } = req.body;
+        const { restaurant, date, time, guests, specialRequests, guestName, guestPhone, isOffline } = req.body;
         
-        const reservation = new Reservation({
-            user: req.user._id,
+        const reservationData = {
             restaurant,
             date,
             time,
             guests,
             specialRequests
-        });
+        };
 
+        if (isOffline) {
+            reservationData.guestName = guestName;
+            reservationData.guestPhone = guestPhone;
+            reservationData.status = 'Confirmed'; // Admin bookings are confirmed by default
+        } else {
+            reservationData.user = req.user._id;
+        }
+
+        const reservation = new Reservation(reservationData);
         const createdReservation = await reservation.save();
         
         // Notify restaurant owner

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut } from 'lucide-react';
+import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut, Home } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -47,6 +47,12 @@ const Navbar = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             {userInfo?.role !== 'restaurant_owner' && (
+              <>
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 500, transition: 'color 0.2s' }}>
+                  <Home size={20} />
+                  <span className="hide-mobile">Home</span>
+                </Link>
+                
                 <Link to="/cart" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 500, transition: 'color 0.2s' }}>
                 <div style={{ position: 'relative' }}>
                     <ShoppingBag size={20} />
@@ -56,6 +62,7 @@ const Navbar = () => {
                 </div>
                 <span className="hide-mobile" style={{ marginLeft: '4px' }}>Cart</span>
                 </Link>
+              </>
             )}
             
             {userInfo ? (
