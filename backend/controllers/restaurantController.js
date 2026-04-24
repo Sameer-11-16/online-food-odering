@@ -108,7 +108,7 @@ const deleteMenuItem = async (req, res) => {
 // @route   POST /api/restaurants/:id/menu
 // @access  Private/RestaurantOwner
 const createMenuItem = async (req, res) => {
-    const { name, description, price, imageUrl, category } = req.body;
+    const { name, description, price, imageUrl, category, foodType } = req.body;
 
     try {
         const restaurant = await Restaurant.findById(req.params.id);
@@ -121,6 +121,7 @@ const createMenuItem = async (req, res) => {
                 price,
                 imageUrl,
                 category,
+                foodType,
             });
 
             const createdMenuItem = await menuItem.save();
@@ -266,6 +267,7 @@ const updateMenuItem = async (req, res) => {
                 menuItem.price = req.body.price || menuItem.price;
                 menuItem.imageUrl = req.body.imageUrl || menuItem.imageUrl;
                 menuItem.category = req.body.category || menuItem.category;
+                menuItem.foodType = req.body.foodType || menuItem.foodType;
 
                 const updatedMenuItem = await menuItem.save();
                 res.json(updatedMenuItem);

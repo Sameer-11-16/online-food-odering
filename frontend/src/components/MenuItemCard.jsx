@@ -152,8 +152,8 @@ const MenuItemCard = ({ item: initialItem, disabled }) => {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingBottom: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{ width: '12px', height: '12px', border: '1px solid var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', borderRadius: '2px' }}>
-                                <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--secondary)' }}></div>
+                            <div style={{ width: '12px', height: '12px', border: `1px solid ${item.foodType === 'Non-Veg' ? '#c0392b' : '#27ae60'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', borderRadius: '2px' }}>
+                                <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: item.foodType === 'Non-Veg' ? '#c0392b' : '#27ae60' }}></div>
                             </div>
                             <h4 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.3px', margin: 0 }}>{item.name}</h4>
                         </div>

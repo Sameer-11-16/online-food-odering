@@ -44,6 +44,7 @@ const BusinessDashboard = () => {
     const [itemPrice, setItemPrice] = useState('');
     const [itemCategory, setItemCategory] = useState('Main');
     const [itemImage, setItemImage] = useState('');
+    const [itemFoodType, setItemFoodType] = useState('Veg');
     const [uploadingMenu, setUploadingMenu] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
 
@@ -175,18 +176,18 @@ const BusinessDashboard = () => {
             
             if (editingItem) {
                 await axios.put(`/api/restaurants/${restaurant._id}/menu/${editingItem}`, {
-                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage
+                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage, foodType: itemFoodType
                 }, config);
                 toast.success(`${itemMenuName} updated!`);
                 setEditingItem(null);
             } else {
                 await axios.post(`/api/restaurants/${restaurant._id}/menu`, {
-                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage
+                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage, foodType: itemFoodType
                 }, config);
                 toast.success(`${itemMenuName} added to menu!`);
             }
             
-            setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage('');
+            setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage(''); setItemFoodType('Veg');
             const { data: menuData } = await axios.get(`/api/restaurants/${restaurant._id}/menu`);
             setMenuItems(menuData);
         } catch (error) {
@@ -201,6 +202,7 @@ const BusinessDashboard = () => {
         setItemPrice(item.price);
         setItemCategory(item.category || 'Main');
         setItemImage(item.imageUrl || '');
+        setItemFoodType(item.foodType || 'Veg');
     };
 
 
@@ -542,7 +544,7 @@ const BusinessDashboard = () => {
                                                     {uploadingMenu && <span style={{ color: 'var(--secondary)', fontSize: '0.9rem', marginTop: '4px', display: 'block' }}>Uploading securely...</span>}
                                                 </div>
                                                 <button type="submit" className="btn btn-secondary" style={{ width: '100%', marginTop: '10px', background: editingItem ? '#1e90ff' : 'var(--secondary)' }}>{editingItem ? 'Update Menu Item' : '+ Publish to Live Menu'}</button>
-                                                {editingItem && <button type="button" onClick={() => { setEditingItem(null); setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage(''); }} style={{ width: '100%', marginTop: '10px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', padding: '8px', borderRadius: '12px', cursor: 'pointer' }}>Cancel Edit</button>}
+                                                {editingItem && <button type="button" onClick={() => { setEditingItem(null); setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage(''); setItemFoodType('Veg'); }} style={{ width: '100%', marginTop: '10px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', padding: '8px', borderRadius: '12px', cursor: 'pointer' }}>Cancel Edit</button>}
 
                                             </form>
                                         </div>

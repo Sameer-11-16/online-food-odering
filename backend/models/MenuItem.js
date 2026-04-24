@@ -24,6 +24,7 @@ const menuItemSchema = mongoose.Schema(
         price: { type: Number, required: true },
         imageUrl: { type: String },
         category: { type: String, required: true },
+        foodType: { type: String, enum: ['Veg', 'Non-Veg'], default: 'Veg' },
         isAvailable: { type: Boolean, default: true },
         reviews: [reviewSchema],
         rating: { type: Number, default: 0 },
