@@ -162,7 +162,7 @@ const Restaurant = () => {
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ color: 'var(--primary)' }}>📍</span> Location Map
                     </h3>
-                    <DeliveryMap address={restaurant.address} name={restaurant.name} />
+                    <DeliveryMap address={restaurant.address} name={restaurant.name} location={restaurant.location} />
                 </div>
             </div>
 

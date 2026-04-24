@@ -25,13 +25,21 @@ const MapUpdater = ({ center }) => {
     return null;
 };
 
-const DeliveryMap = ({ address, name }) => {
+const DeliveryMap = ({ address, name, location }) => {
     // Default to New Delhi coordinates
     const [position, setPosition] = useState([28.6139, 77.2090]);
     const [loading, setLoading] = useState(true);
     const [searched, setSearched] = useState(false);
 
     useEffect(() => {
+        // If exact location coordinates are provided, use them immediately
+        if (location?.lat && location?.lng) {
+            setPosition([parseFloat(location.lat), parseFloat(location.lng)]);
+            setLoading(false);
+            setSearched(true);
+            return;
+        }
+
         if (!address) {
             setLoading(false);
             return;
@@ -46,17 +54,16 @@ const DeliveryMap = ({ address, name }) => {
 
                 if (data && data.length > 0) {
                     setPosition([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+                    setSearched(true);
                 }
             } catch (error) {
                 console.error("Geocoding failed:", error);
-                // Fallback position is already set
             }
             setLoading(false);
-            setSearched(true);
         };
 
         fetchCoordinates();
-    }, [address]);
+    }, [address, location]);
 
     if (loading) {
         return (
