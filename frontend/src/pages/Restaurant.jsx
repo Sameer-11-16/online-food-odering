@@ -258,7 +258,7 @@ const Restaurant = () => {
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', alignItems: 'start' }}>
+                        <div className="profile-layout" style={{ display: 'grid', gridTemplateColumns: restaurant.reviews.length > 0 ? '1fr 1.5fr' : '1fr', gap: '30px', alignItems: 'start' }}>
                                 {/* Information about Reviews */}
                                 <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
                                     <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '16px' }}>Share Your Experience</h3>

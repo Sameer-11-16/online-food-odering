@@ -173,7 +173,15 @@ const CustomerDashboard = () => {
                                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     ✨ Pending Reviews <span style={{ background: 'var(--primary)', color: 'white', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>{activity.pendingReviews.length}</span>
                                 </h3>
-                                <div style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '16px', scrollbarWidth: 'none' }}>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    overflowX: 'auto', 
+                                    gap: '16px', 
+                                    padding: '4px 4px 20px 4px', 
+                                    margin: '0 -4px',
+                                    scrollbarWidth: 'none',
+                                    WebkitOverflowScrolling: 'touch'
+                                }}>
                                     {activity.pendingReviews.map(order => (
                                         <div key={order._id} className="glass-panel" style={{ minWidth: '280px', padding: '20px', flexShrink: 0 }}>
                                             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
@@ -247,7 +255,13 @@ const CustomerDashboard = () => {
                             animate={{ scale: 1, opacity: 1 }} 
                             exit={{ scale: 0.9, opacity: 0 }}
                             className="glass-panel" 
-                            style={{ padding: '30px', maxWidth: '400px', width: '100%' }}
+                            style={{ 
+                                padding: 'clamp(20px, 5vw, 30px)', 
+                                maxWidth: '400px', 
+                                width: 'calc(100% - 32px)',
+                                maxHeight: '90vh',
+                                overflowY: 'auto'
+                            }}
                         >
                             <h3 style={{ marginBottom: '20px', fontWeight: 800 }}>Quick Review</h3>
                             <form onSubmit={handleReviewSubmit}>
