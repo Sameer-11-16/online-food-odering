@@ -320,9 +320,9 @@ const BusinessDashboard = () => {
             ) : (
                 <div className="dashboard-layout" style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                    gap: '30px', 
-                    padding: '0 20px' 
+                    gridTemplateColumns: '1fr', 
+                    gap: '20px', 
+                    padding: '0 clamp(10px, 3vw, 20px)' 
                 }}>
                     
                     <style>{`
@@ -362,11 +362,11 @@ const BusinessDashboard = () => {
                         gap: '8px', 
                         overflowY: 'auto' 
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--glass-border)' }}>
-                            {restaurant.imageUrl && <div style={{ width: '50px', height: '50px', borderRadius: '12px', backgroundImage: `url(${restaurant.imageUrl.startsWith('http') ? restaurant.imageUrl : API_BASE_URL + restaurant.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}></div>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)' }}>
+                            {restaurant.imageUrl && <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundImage: `url(${restaurant.imageUrl.startsWith('http') ? restaurant.imageUrl : API_BASE_URL + restaurant.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}></div>}
                             <div style={{ overflow: 'hidden' }}>
-                                <h3 style={{ fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{restaurant.name}</h3>
-                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8.5rem', marginTop: '2px' }}>Admin / Owner</p>
+                                <h3 style={{ fontSize: '0.95rem', color: 'var(--primary)', fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{restaurant.name}</h3>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '2px' }}>Admin Panel</p>
                             </div>
                         </div>
 
@@ -413,7 +413,7 @@ const BusinessDashboard = () => {
                     </div>
 
                     {/* Main Workspace Area */}
-                    <div className="glass-panel" style={{ padding: '40px', minHeight: '600px', border: 'none', background: 'transparent' }}>
+                    <div className="glass-panel main-workspace" style={{ padding: 'clamp(15px, 4vw, 40px)', minHeight: '600px', border: 'none', background: 'transparent' }}>
                         <AnimatePresence mode="wait">
                             {activeTab === 'overview' && (
                                 <motion.div key="overview" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
