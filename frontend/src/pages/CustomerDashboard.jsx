@@ -36,6 +36,7 @@ const CustomerDashboard = () => {
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
     const [reservations, setReservations] = useState([]);
+    const [activity, setActivity] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,6 +47,9 @@ const CustomerDashboard = () => {
             } else if (activeTab === 'bookings') {
                 const { data } = await axios.get('/api/reservations/myreservations', config);
                 setReservations(data);
+            } else if (activeTab === 'activity') {
+                const { data } = await axios.get('/api/users/activity', config);
+                setActivity(data);
             }
         };
         fetchData();
@@ -90,6 +94,7 @@ const CustomerDashboard = () => {
                     <button onClick={() => setActiveTab('orders')} className={`btn ${activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'}`}>My Orders</button>
                     <button onClick={() => setActiveTab('bookings')} className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}>Table Bookings</button>
                     <button onClick={() => setActiveTab('receipts')} className={`btn ${activeTab === 'receipts' ? 'btn-primary' : 'btn-secondary'}`}>Receipts</button>
+                    <button onClick={() => setActiveTab('activity')} className={`btn ${activeTab === 'activity' ? 'btn-primary' : 'btn-secondary'}`}>My Activity</button>
                 </div>
             </div>
 
@@ -140,6 +145,35 @@ const CustomerDashboard = () => {
                              <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{res.guests} Guests • {res.status}</p>
                         </div>
                     ))
+                ) : activeTab === 'activity' ? (
+                    activity?.reviews.length === 0 ? (
+                        <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>No activity yet. Start ordering and sharing your experiences!</p>
+                    ) : (
+                        activity?.reviews.map((rev, i) => (
+                            <motion.div 
+                                key={i} 
+                                initial={{ opacity: 0, scale: 0.95 }} 
+                                animate={{ opacity: 1, scale: 1 }} 
+                                transition={{ delay: i * 0.05 }}
+                                className="glass-panel" 
+                                style={{ padding: '20px', borderLeft: `4px solid ${rev.type === 'Restaurant' ? 'var(--primary)' : '#2ed573'}` }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                    <div>
+                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{rev.type} Review</span>
+                                        <h4 style={{ fontWeight: 800, fontSize: '1.05rem', marginTop: '2px' }}>{rev.targetName}</h4>
+                                    </div>
+                                    <div style={{ background: 'rgba(255, 165, 2, 0.15)', color: '#ffa502', padding: '4px 8px', borderRadius: '8px', fontWeight: 800, fontSize: '0.85rem' }}>
+                                        ⭐ {rev.rating}
+                                    </div>
+                                </div>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '12px' }}>"{rev.comment}"</p>
+                                <div style={{ fontSize: '0.75rem', opacity: 0.5, textAlign: 'right' }}>
+                                    {new Date(rev.createdAt).toLocaleDateString()}
+                                </div>
+                            </motion.div>
+                        ))
+                    )
                 ) : (
                     <div style={{ gridColumn: '1 / -1' }}>
                         <ReceiptsPanel orders={orders} />

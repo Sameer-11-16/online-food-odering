@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Restaurant = require('../models/Restaurant');
+const MenuItem = require('../models/MenuItem');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -43,10 +45,57 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
+// @desc    Get user activity (reviews, etc.)
+// @route   GET /api/users/activity
+// @access  Private
+const getUserActivity = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        
+        // Find restaurant reviews
+        const restaurants = await Restaurant.find({ "reviews.user": userId });
+        const restaurantReviews = restaurants.flatMap(r => 
+            r.reviews
+                .filter(rev => rev.user.toString() === userId.toString())
+                .map(rev => ({ 
+                    ...rev.toObject(), 
+                    type: 'Restaurant', 
+                    targetName: r.name, 
+                    targetId: r._id,
+                    image: r.imageUrl
+                }))
+        );
+
+        // Find menu item reviews
+        const menuItems = await MenuItem.find({ "reviews.user": userId });
+        const itemReviews = menuItems.flatMap(m => 
+            m.reviews
+                .filter(rev => rev.user.toString() === userId.toString())
+                .map(rev => ({ 
+                    ...rev.toObject(), 
+                    type: 'Food Item', 
+                    targetName: m.name, 
+                    targetId: m._id,
+                    image: m.imageUrl
+                }))
+        );
+
+        const allReviews = [...restaurantReviews, ...itemReviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        res.json({
+            reviews: allReviews,
+            count: allReviews.length
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getUsers,
     updateUserProfile,
     deleteUser,
+    getUserActivity
 };
 
 // @desc    Delete a user
