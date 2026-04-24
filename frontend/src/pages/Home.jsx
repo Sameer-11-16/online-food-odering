@@ -46,20 +46,21 @@ const Home = () => {
                 initial={{ y: 30, opacity: 0 }} 
                 animate={{ y: 0, opacity: 1 }} 
                 transition={{ delay: 0.2, duration: 0.6 }}
-                style={{ textAlign: 'center', padding: '60px 0 40px', maxWidth: '800px', margin: '0 auto' }}>
-                <h1 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '20px', lineHeight: 1.1 }}>
-                    Premium food delivery <br />
+                className="hero-section"
+                style={{ textAlign: 'center', padding: '80px 0 60px', maxWidth: '900px', margin: '0 auto' }}>
+                <h1 style={{ fontWeight: 800, marginBottom: '24px' }}>
+                    Premium food delivery <br className="hide-mobile" />
                     to your <span className="gradient-text">doorstep</span>
                 </h1>
-                <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '40px' }}>
+                <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: 'var(--text-secondary)', marginBottom: '40px', lineHeight: 1.6 }}>
                     Experience the finest dining from the comfort of your home. 
                     Fast, fresh, and flawlessly delivered.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                <div className="btn-group-responsive" style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
                     <motion.button
                         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                         className="btn btn-primary"
-                        style={{ padding: '14px 32px', fontSize: '1.1rem' }}
+                        style={{ padding: '14px 40px', fontSize: '1.1rem' }}
                         onClick={() => document.getElementById('restaurant-list')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                         Order Now
@@ -68,7 +69,7 @@ const Home = () => {
                         <motion.button
                             whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                             className="btn btn-secondary"
-                            style={{ padding: '14px 32px', fontSize: '1.1rem' }}
+                            style={{ padding: '14px 40px', fontSize: '1.1rem', width: '100%' }}
                         >
                             View All Restaurants
                         </motion.button>
@@ -77,8 +78,8 @@ const Home = () => {
             </motion.section>
 
             <section id="restaurant-list" style={{ marginTop: '40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>Featured Restaurants</h2>
+                <div className="section-header">
+                    <h2 style={{ fontWeight: 700 }}>Featured Restaurants</h2>
                     <Link to="/restaurants" style={{ color: 'var(--primary)', fontWeight: 600 }}>See All</Link>
                 </div>
                 

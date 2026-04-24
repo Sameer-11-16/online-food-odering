@@ -116,7 +116,7 @@ const Restaurant = () => {
     return (
         <div style={{ paddingBottom: '60px' }}>
             {/* Hero Section */}
-            <div className="glass-panel" style={{ padding: '40px', marginBottom: '40px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(to right, var(--glass-bg), rgba(255, 71, 87, 0.05))' }}>
+            <div className="glass-panel hero-section" style={{ padding: '40px', marginBottom: '40px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(to right, var(--glass-bg), rgba(255, 71, 87, 0.05))' }}>
                 {tooFar && (
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: 'rgba(255, 71, 87, 0.9)', padding: '8px', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 800, zIndex: 10 }}>
                         <AlertTriangle size={16} /> Out of Delivery Range — Orders Disabled ({dist.toFixed(1)} km away)
@@ -127,11 +127,11 @@ const Restaurant = () => {
                     <ArrowLeft size={16} /> Back to restaurants
                 </Link>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '8px' }}>{restaurant.name}</h1>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '600px' }}>{restaurant.description}</p>
+                    <div style={{ flex: '1 1 300px' }}>
+                        <h1 style={{ fontWeight: 800, marginBottom: '8px' }}>{restaurant.name}</h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(1rem, 2vw, 1.1rem)', maxWidth: '600px' }}>{restaurant.description}</p>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
+                    <div style={{ textAlign: 'right', flex: '0 0 auto' }}>
                         <div style={{ display: 'inline-flex', backgroundColor: 'var(--primary)', color: 'white', padding: '8px 16px', borderRadius: '12px', fontWeight: 700, gap: '6px', alignItems: 'center' }}>
                             ⭐ {restaurant.rating.toFixed(1)}
                         </div>
@@ -149,7 +149,7 @@ const Restaurant = () => {
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid var(--glass-border)', paddingBottom: '16px', overflowX: 'auto', whiteSpace: 'nowrap', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
                 <button 
                     onClick={() => setActiveTab('menu')}
                     style={{ padding: '8px 24px', borderRadius: '20px', border: 'none', background: activeTab === 'menu' ? 'var(--primary)' : 'transparent', color: activeTab === 'menu' ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s' }}>

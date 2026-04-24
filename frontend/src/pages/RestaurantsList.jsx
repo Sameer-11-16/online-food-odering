@@ -35,8 +35,8 @@ const RestaurantsList = () => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '60px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>All Restaurants</h1>
+            <div className="responsive-header">
+                <h1 style={{ fontWeight: 800 }}>All Restaurants</h1>
             </div>
             
             <div className="card-grid">

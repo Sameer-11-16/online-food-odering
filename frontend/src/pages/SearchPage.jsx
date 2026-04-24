@@ -38,14 +38,14 @@ const SearchPage = () => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '60px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '30px' }}>
-                <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Search Results for "{searchQuery}"</h1>
-                <Link to="/" className="btn btn-secondary" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ArrowLeft size={16} /> Back
+            <div className="responsive-header">
+                <h1 style={{ fontWeight: 800 }}>Search Results for "{searchQuery}"</h1>
+                <Link to="/" className="btn btn-secondary" style={{ padding: '8px 24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <ArrowLeft size={18} /> Back
                 </Link>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
+            <div className="card-grid">
                 {foodItems.map((item, i) => (
                     <motion.div key={item._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                         <div style={{ marginBottom: '10px', fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 700 }}>

@@ -180,12 +180,22 @@ const Checkout = () => {
     if (cartItems.length === 0) return null;
 
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 0' }}>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '30px' }}>Secure Checkout</h1>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '60px' }}>
+            <div className="responsive-header">
+                <h1 style={{ fontWeight: 800 }}>Secure Checkout</h1>
+                <Link to="/cart" style={{ color: 'var(--primary)', fontWeight: 600 }}>Modify Cart</Link>
+            </div>
             
             {error && <div style={{ background: 'rgba(255, 71, 87, 0.1)', padding: '12px', color: 'var(--primary)', borderRadius: '8px', marginBottom: '20px', fontWeight: 600 }}>{error}</div>}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1.5fr) 1fr', gap: '30px' }} className="profile-layout">
+            <div className="checkout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
+                <style>{`
+                    @media (min-width: 992px) {
+                        .checkout-grid {
+                            grid-template-columns: 1.5fr 1fr !important;
+                        }
+                    }
+                `}</style>
                 <div className="glass-panel" style={{ padding: '30px' }}>
                     <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Delivery Details</h2>
                     <form id="checkout-form" onSubmit={submitHandler}>
@@ -193,7 +203,7 @@ const Checkout = () => {
                             <label className="input-label">Street Address</label>
                             <input type="text" className="input-glass" required value={address} onChange={e => setAddress(e.target.value)} />
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                             <div className="input-group">
                                 <label className="input-label">City</label>
                                 <input type="text" className="input-glass" required value={city} onChange={e => setCity(e.target.value)} />

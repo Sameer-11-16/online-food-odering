@@ -150,18 +150,105 @@ a {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 .container-wide {
-  max-width: 1600px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
 }
 
 main {
   padding-top: 2rem;
   padding-bottom: 4rem;
+}
+
+/* Responsive Typography */
+h1 { font-size: 3.5rem; line-height: 1.1; font-weight: 800; }
+h2 { font-size: 2.2rem; line-height: 1.2; font-weight: 700; }
+h3 { font-size: 1.8rem; line-height: 1.3; font-weight: 700; }
+
+@media (max-width: 992px) {
+  h1 { font-size: 2.8rem; }
+  h2 { font-size: 1.8rem; }
+  h3 { font-size: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.3rem; }
+  
+  .container, .container-wide {
+    padding: 0 16px;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .mobile-only {
+    display: flex !important;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  main {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  .profile-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .hero-section {
+    padding: 40px 16px !important;
+  }
+  
+  .btn-group-responsive {
+    flex-direction: column !important;
+    width: 100%;
+  }
+  
+  .btn-group-responsive .btn, .btn-group-responsive a {
+    width: 100% !important;
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.responsive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .responsive-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .input-glass {
@@ -216,39 +303,3 @@ select.input-glass {
   font-weight: 500;
 }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-@media (max-width: 768px) {
-  .hide-mobile {
-    display: none !important;
-  }
-  
-  .mobile-only {
-    display: flex !important;
-  }
-  
-  h1 {
-    font-size: 2.2rem !important;
-  }
-  
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  main {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
-  }
-
-  .profile-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  .container {
-    padding: 0 16px;
-  }
-}
