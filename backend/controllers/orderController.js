@@ -4,7 +4,8 @@ const Order = require('../models/Order');
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = async (req, res) => {
-    const { orderItems, shippingAddress, paymentMethod, totalPrice, restaurant } = req.body;
+    const { orderItems, shippingAddress, paymentMethod, totalPrice, restaurant, paymentResult } = req.body;
+
 
     console.log('Incoming Order Data:', { restaurant, itemCount: orderItems?.length, totalPrice });
 
@@ -21,6 +22,10 @@ const addOrderItems = async (req, res) => {
                 shippingAddress,
                 paymentMethod,
                 totalPrice,
+                paymentResult,
+                isPaid: paymentMethod === 'Razorpay Online',
+                paidAt: paymentMethod === 'Razorpay Online' ? Date.now() : null,
+
             });
 
             const createdOrder = await order.save();
@@ -119,10 +124,47 @@ const getRestaurantOrders = async (req, res) => {
     }
 };
 
+// @desc    Get all orders (Admin only)
+// @route   GET /api/orders
+// @access  Private/Admin
+const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({})
+            .populate('user', 'name email')
+            .populate('restaurant', 'name')
+            .sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Verify Manual UPI Payment (Admin only)
+// @route   PUT /api/orders/:id/verify-upi
+// @access  Private/Admin
+const verifyUpiPayment = async (req, res) => {
+
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        order.isPaid = true;
+        order.paidAt = Date.now();
+        if (order.paymentResult) order.paymentResult.status = 'verified';
+        const updated = await order.save();
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     addOrderItems,
     getOrderById,
     getMyOrders,
     updateOrderStatus,
     getRestaurantOrders,
+    getOrders,
+    verifyUpiPayment,
 };
+
+

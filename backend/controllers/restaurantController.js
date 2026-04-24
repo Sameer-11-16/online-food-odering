@@ -121,8 +121,17 @@ const updateRestaurant = async (req, res) => {
             restaurant.description = req.body.description || restaurant.description;
             restaurant.imageUrl = req.body.imageUrl || restaurant.imageUrl;
             restaurant.address = req.body.address || restaurant.address;
+            restaurant.upiId = req.body.upiId !== undefined ? req.body.upiId : restaurant.upiId;
+            if (req.body.location) {
+                restaurant.location = {
+                    lat: req.body.location.lat ?? restaurant.location?.lat,
+                    lng: req.body.location.lng ?? restaurant.location?.lng,
+                };
+            }
+
 
             const updatedRestaurant = await restaurant.save();
+
             res.json(updatedRestaurant);
         } else {
             res.status(401).json({ message: 'Not authorized' });
@@ -219,6 +228,34 @@ const createMenuItemReview = async (req, res) => {
     }
 };
 
+// @desc    Update a menu item
+// @route   PUT /api/restaurants/:id/menu/:menuId
+// @access  Private/RestaurantOwner
+const updateMenuItem = async (req, res) => {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id);
+        if (restaurant && restaurant.owner.toString() === req.user._id.toString()) {
+            const menuItem = await MenuItem.findById(req.params.menuId);
+            if (menuItem) {
+                menuItem.name = req.body.name || menuItem.name;
+                menuItem.description = req.body.description || menuItem.description;
+                menuItem.price = req.body.price || menuItem.price;
+                menuItem.imageUrl = req.body.imageUrl || menuItem.imageUrl;
+                menuItem.category = req.body.category || menuItem.category;
+
+                const updatedMenuItem = await menuItem.save();
+                res.json(updatedMenuItem);
+            } else {
+                res.status(404).json({ message: 'Menu item not found' });
+            }
+        } else {
+            res.status(401).json({ message: 'Not authorized' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getRestaurants,
     getRestaurantById,
@@ -227,7 +264,9 @@ module.exports = {
     createMenuItem,
     deleteMenuItem,
     updateRestaurant,
+    updateMenuItem,
     createRestaurantReview,
     createMenuItemReview,
 };
+
 

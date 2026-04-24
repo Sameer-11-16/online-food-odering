@@ -5,12 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from '../components/CheckoutForm';
-
-// Stripe Official Universal Test Key for safe generic testing
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 const Checkout = () => {
     const { cartItems, removeFromCart } = useCart();
@@ -21,8 +15,12 @@ const Checkout = () => {
     const [city, setCity] = useState('');
     const [postalCode, setPostalCode] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Cash on Delivery');
+    const [utrNumber, setUtrNumber] = useState('');
+    const [showUpiModal, setShowUpiModal] = useState(false);
+    const [restaurantDetails, setRestaurantDetails] = useState(null);
     const [error, setError] = useState('');
-    const [clientSecret, setClientSecret] = useState('');
+
+
 
     const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
     const taxes = subtotal * 0.08;
@@ -35,31 +33,68 @@ const Checkout = () => {
         } else if (cartItems.length === 0) {
             navigate('/cart');
         } else {
-            // Fetch Stripe client secret
-            const fetchSecret = async () => {
+            const fetchRestaurant = async () => {
                 try {
-                    const { data } = await axios.post('/api/stripe/create-payment-intent', {
-                        items: cartItems,
-                        totalPrice: total
-                    });
-                    setClientSecret(data.clientSecret);
+                    const { data } = await axios.get(`/api/restaurants/${cartItems[0].restaurant}`);
+                    setRestaurantDetails(data);
                 } catch (err) {
-                    console.error("Failed to generate payment intent");
+                    console.error("Failed to load restaurant details for payment");
                 }
             };
-            fetchSecret();
+            fetchRestaurant();
         }
-    }, [userInfo, cartItems, navigate, total]);
+    }, [userInfo, cartItems, navigate]);
+
+
+    // Load Razorpay Script
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
 
     const submitHandler = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setError('');
         
+        if (paymentMethod === 'Online Payment (UPI/Card)') {
+            handleRazorpayPayment();
+            return;
+        }
+
+        if (paymentMethod === 'Direct UPI (Scan & Pay)') {
+            setShowUpiModal(true);
+            return;
+        }
+
+        placeOrder();
+
+    };
+
+    const handleUpiSubmit = () => {
+        const upiToUse = restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID;
+        if (!upiToUse) {
+            toast.error('Payment failed: Restaurant has not set up a UPI ID yet.');
+            return;
+        }
+        if (utrNumber.length < 12) {
+            toast.error('Please enter a valid 12-digit UTR/Transaction ID');
+            return;
+        }
+        setShowUpiModal(false);
+        placeOrder({ id: utrNumber, status: 'Verification Pending' });
+    };
+
+
+    const placeOrder = async (paymentDetails = null) => {
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-            
-            // Assume single restaurant in cart for simplicity
-            const restaurantId = cartItems[0]?.restaurant || '60d5ec4967df2c2b143e2345'; // fallback but should exist!
+            const restaurantId = cartItems[0]?.restaurant;
 
             const formattedItems = cartItems.map(item => ({
                 name: item.name,
@@ -71,37 +106,76 @@ const Checkout = () => {
             
             const reqBody = {
                 orderItems: formattedItems,
-                shippingAddress: { address, city, postalCode, country: 'US' },
-                paymentMethod,
+                shippingAddress: { address, city, postalCode, country: 'IN' },
+                paymentMethod: paymentDetails?.status === 'Verification Pending' ? 'Manual UPI' : (paymentDetails ? 'Razorpay Online' : 'Cash on Delivery'),
                 totalPrice: total,
-                restaurant: restaurantId // Mongoose ObjectId
+                restaurant: restaurantId,
+                paymentResult: paymentDetails ? {
+                    id: paymentDetails.id || paymentDetails.razorpay_payment_id,
+                    status: paymentDetails.status || 'succeeded',
+                    update_time: new Date().toISOString(),
+                } : null
             };
+
+
 
             await axios.post('/api/orders', reqBody, config);
             
-            toast.success('Order Placed Successfully!', {
-                icon: '🎉',
-                duration: 5000,
-            });
+            toast.success('Order Placed Successfully!', { icon: '🎉' });
+            new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3').play().catch(() => {});
 
-            // play sound
-            new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3').play().catch(e => {});
-
-            // Clear items (simplistic clone avoiding array mutation errors)
-            const itemsToClear = [...cartItems];
-            itemsToClear.forEach(item => removeFromCart(item._id));
-            
-            navigate('/profile');
+            cartItems.forEach(item => removeFromCart(item._id));
+            navigate('/payment-success');
             
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to place order');
         }
     };
 
-    const handleStripeSuccess = async () => {
-        // Since Stripe validation passed, we can submit the order directly.
-        await submitHandler({ preventDefault: () => {} });
+    const handleRazorpayPayment = async () => {
+        const res = await loadRazorpay();
+        if (!res) {
+            toast.error('Razorpay SDK failed to load. Are you online?');
+            return;
+        }
+
+        try {
+            const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            // 1. Create order on backend
+            const { data: order } = await axios.post('/api/razorpay/order', { amount: total }, config);
+
+            // 2. Open Razorpay Modal
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummy',
+                amount: order.amount,
+                currency: order.currency,
+                name: "BiteStream Food",
+                description: "Complete your delicious order",
+                order_id: order.id,
+                handler: async (response) => {
+                    // 3. Verify Payment and Place Order
+                    try {
+                        await axios.post('/api/razorpay/verify', response, config);
+                        placeOrder(response);
+                    } catch (err) {
+                        toast.error("Payment verification failed!");
+                    }
+                },
+                prefill: {
+                    name: userInfo.name,
+                    email: userInfo.email,
+                    contact: userInfo.phone || ""
+                },
+                theme: { color: "#ff4757" }
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (err) {
+            toast.error("Error initiating payment");
+        }
     };
+
 
     if (cartItems.length === 0) return null;
 
@@ -134,27 +208,64 @@ const Checkout = () => {
                         <div className="input-group">
                             <select className="input-glass" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
                                 <option value="Cash on Delivery">Cash on Delivery</option>
-                                <option value="Credit Card (Demo)">Credit Card (Demo)</option>
+                                <option value="Online Payment (UPI/Card)">Online Payment (UPI/Card)</option>
+                                <option value="Direct UPI (Scan & Pay)">Direct UPI (Scan & Pay) - 0% Fee</option>
                             </select>
                         </div>
 
-                        {paymentMethod === 'Cash on Delivery' && (
-                            <div style={{ marginTop: '30px' }}>
-                                <button form="checkout-form" type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '1.1rem' }}>
-                                    Place Live Order
-                                </button>
-                            </div>
-                        )}
+                        <div style={{ marginTop: '30px' }}>
+                            <button form="checkout-form" type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '1.1rem' }}>
+                                {paymentMethod === 'Cash on Delivery' ? 'Place Order (COD)' : 'Proceed to Payment'}
+                            </button>
+                        </div>
                     </form>
 
-                    {paymentMethod === 'Credit Card (Demo)' && clientSecret && (
-                        <div style={{ marginTop: '30px' }}>
-                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
-                                <CheckoutForm amount={total} onSuccess={handleStripeSuccess} />
-                            </Elements>
-                        </div>
+                    {/* Manual UPI Modal */}
+                    {showUpiModal && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+                            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="glass-panel" style={{ padding: '30px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+                                <h3 style={{ marginBottom: '20px' }}>Scan & Pay with Any App</h3>
+                                <div style={{ background: 'white', padding: '15px', borderRadius: '15px', display: 'inline-block', marginBottom: '20px' }}>
+                                    <img 
+                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                                            `upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Food Order')}&tr=${Date.now()}`
+                                        )}`} 
+                                        alt="UPI QR" 
+                                        style={{ width: '220px', height: '220px' }} 
+                                    />
+                                </div>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+                                    Pay <strong>₹{total.toFixed(2)}</strong> to <strong>{restaurantDetails?.name || 'Admin'}</strong><br/>
+                                    <span 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID);
+                                            toast.success('UPI ID copied to clipboard!');
+                                        }}
+                                        style={{ fontSize: '0.75rem', opacity: 0.7, cursor: 'pointer', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '4px', marginTop: '5px', display: 'inline-block' }}
+                                    >
+                                        ID: {restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID} 📋
+                                    </span>
+                                </p>
+
+
+
+
+                                
+                                <div className="input-group" style={{ textAlign: 'left' }}>
+                                    <label className="input-label">Enter 12-Digit UTR / Ref Number</label>
+                                    <input type="text" className="input-glass" placeholder="Example: 3042XXXXXXXX" value={utrNumber} onChange={e => setUtrNumber(e.target.value)} maxLength={12} />
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                    <button onClick={handleUpiSubmit} className="btn btn-primary" style={{ flex: 1 }}>Submit UTR</button>
+                                    <button onClick={() => setShowUpiModal(false)} className="btn btn-secondary">Cancel</button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
                     )}
                 </div>
+
+
 
                 <div className="glass-panel" style={{ padding: '30px', height: 'fit-content' }}>
                     <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Order Summary</h2>
@@ -184,9 +295,14 @@ const Checkout = () => {
                     {paymentMethod === 'Cash on Delivery' && (
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '16px' }}>You will pay in cash upon delivery.</p>
                     )}
-                    {paymentMethod === 'Credit Card (Demo)' && (
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '16px' }}>Complete the payment form to the left to place order.</p>
+                    {paymentMethod === 'Online Payment (UPI/Card)' && (
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '16px' }}>Pay securely via UPI, Cards, or NetBanking.</p>
                     )}
+                    {paymentMethod === 'Direct UPI (Scan & Pay)' && (
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '16px' }}>Scan QR and enter UTR for 0% processing fee.</p>
+                    )}
+
+
                     <Link to="/cart" style={{ display: 'block', textAlign: 'center', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                         Return to Cart
                     </Link>

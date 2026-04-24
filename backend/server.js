@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
+dotenv.config();
 const cors = require('cors');
 const connectDB = require('./db');
 const path = require('path');
@@ -9,12 +10,13 @@ const restaurantRoutes = require('./routes/restaurantRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
+const razorpayRoutes = require('./routes/razorpayRoutes');
 
 const http = require('http');
 const { Server } = require('socket.io');
 
-dotenv.config();
+
+
 
 connectDB();
 
@@ -40,7 +42,7 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/upload', uploadRoutes);
-app.use('/api/stripe', paymentRoutes);
+app.use('/api/razorpay', razorpayRoutes);
 app.use('/api/users', require('./routes/userRoutes'));
 
 app.get('/', (req, res) => {

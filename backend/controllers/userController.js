@@ -45,5 +45,25 @@ const updateUserProfile = async (req, res) => {
 
 module.exports = {
     getUsers,
-    updateUserProfile
+    updateUserProfile,
+    deleteUser,
 };
+
+// @desc    Delete a user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+async function deleteUser(req, res) {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(401).json({ message: 'Not authorized as an admin' });
+        }
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user.role === 'admin') return res.status(400).json({ message: 'Cannot delete admin user' });
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ message: 'User removed' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+

@@ -9,6 +9,15 @@ import { Utensils, Package, Calendar, Settings, Activity, ChefHat, CreditCard, B
 import OverviewPanel from '../components/dashboard/OverviewPanel';
 import KitchenPanel from '../components/dashboard/KitchenPanel';
 import SettingsPanel from '../components/dashboard/SettingsPanel';
+import InventoryPanel from '../components/dashboard/InventoryPanel';
+import CustomersPanel from '../components/dashboard/CustomersPanel';
+import AnalyticsPanel from '../components/dashboard/AnalyticsPanel';
+import OffersPanel from '../components/dashboard/OffersPanel';
+import NotificationsPanel from '../components/dashboard/NotificationsPanel';
+import DeliveryPanel from '../components/dashboard/DeliveryPanel';
+import StaffPanel from '../components/dashboard/StaffPanel';
+import ReviewsPanel from '../components/dashboard/ReviewsPanel';
+import SecurityPanel from '../components/dashboard/SecurityPanel';
 import API_BASE_URL from '../apiConfig';
 
 const BusinessDashboard = () => {
@@ -35,6 +44,8 @@ const BusinessDashboard = () => {
     const [itemCategory, setItemCategory] = useState('Main');
     const [itemImage, setItemImage] = useState('');
     const [uploadingMenu, setUploadingMenu] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
+
 
     // Orders and Reservations
     const [orders, setOrders] = useState([]);
@@ -157,18 +168,37 @@ const BusinessDashboard = () => {
         e.preventDefault();
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-            await axios.post(`/api/restaurants/${restaurant._id}/menu`, {
-                name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage
-            }, config);
-            toast.success(`${itemMenuName} added to menu!`);
-            setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage('');
             
+            if (editingItem) {
+                await axios.put(`/api/restaurants/${restaurant._id}/menu/${editingItem}`, {
+                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage
+                }, config);
+                toast.success(`${itemMenuName} updated!`);
+                setEditingItem(null);
+            } else {
+                await axios.post(`/api/restaurants/${restaurant._id}/menu`, {
+                    name: itemMenuName, description: itemDesc, price: Number(itemPrice), category: itemCategory, imageUrl: itemImage
+                }, config);
+                toast.success(`${itemMenuName} added to menu!`);
+            }
+            
+            setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage('');
             const { data: menuData } = await axios.get(`/api/restaurants/${restaurant._id}/menu`);
             setMenuItems(menuData);
         } catch (error) {
-            toast.error('Failed to add menu item.');
+            toast.error('Failed to save menu item.');
         }
     };
+
+    const handleEditMenuItem = (item) => {
+        setEditingItem(item._id);
+        setItemMenuName(item.name);
+        setItemDesc(item.description);
+        setItemPrice(item.price);
+        setItemCategory(item.category || 'Main');
+        setItemImage(item.imageUrl || '');
+    };
+
 
     const handleDeleteMenuItem = async (menuId) => {
         try {
@@ -356,19 +386,73 @@ const BusinessDashboard = () => {
                                 </motion.div>
                             )}
 
-                            {activeTab === 'settings' && (
-                                <motion.div key="settings" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
-                                    <SettingsPanel restaurant={restaurant} />
-                                </motion.div>
-                            )}
+                             {activeTab === 'settings' && (
+                                 <motion.div key="settings" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <SettingsPanel 
+                                         restaurant={restaurant} 
+                                         userInfo={userInfo} 
+                                         onUpdate={(data) => setRestaurant(data)} 
+                                     />
+                                 </motion.div>
+                             )}
+
                             
-                            {activeTab === 'billing' && (
-                                <motion.div key="billing" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} style={{ textAlign: 'center', padding: '60px' }}>
-                                    <h2>Billing & Invoicing</h2>
-                                    <p style={{ color: 'var(--text-secondary)' }}>Stripe payouts and COD invoices will appear here soon.</p>
-                                    <CreditCard size={48} style={{ opacity: 0.2, marginTop: '20px' }} />
-                                </motion.div>
-                            )}
+                             {activeTab === 'billing' && (
+                                 <motion.div key="billing" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <div className="glass-panel" style={{ padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
+                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
+                                             <div style={{ padding: '12px', background: 'rgba(46, 213, 115, 0.1)', borderRadius: '12px' }}>
+                                                 <CreditCard size={28} color="var(--secondary)" />
+                                             </div>
+                                             <div>
+                                                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Payment & Payout Settings</h2>
+                                                 <p style={{ color: 'var(--text-secondary)' }}>Configure how you receive money from customers.</p>
+                                             </div>
+                                         </div>
+
+                                         <div style={{ background: 'rgba(46, 213, 115, 0.05)', border: '1px solid var(--secondary)', padding: '25px', borderRadius: '20px', marginBottom: '30px' }}>
+                                             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--secondary)', marginBottom: '10px' }}>Direct UPI Payment (Free)</h3>
+                                             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>Enter your UPI ID below to enable the "Scan & Pay" option at checkout. This allows you to receive 100% of the order value directly to your bank account with zero platform fees.</p>
+                                             
+                                             <div className="input-group">
+                                                 <label className="input-label">Your UPI ID (e.g. name@okicici)</label>
+                                                 <div style={{ display: 'flex', gap: '10px' }}>
+                                                     <input 
+                                                         type="text" 
+                                                         className="input-glass" 
+                                                         value={restaurant.upiId || ''} 
+                                                         onChange={(e) => setRestaurant({...restaurant, upiId: e.target.value})}
+                                                         placeholder="Enter your UPI ID"
+                                                     />
+                                                     <button 
+                                                         onClick={async () => {
+                                                             try {
+                                                                 const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+                                                                 await axios.put(`/api/restaurants/${restaurant._id}`, { upiId: restaurant.upiId }, config);
+                                                                 toast.success('UPI ID Saved Successfully!');
+                                                             } catch (err) {
+                                                                 toast.error('Failed to save UPI ID');
+                                                             }
+                                                         }} 
+                                                         className="btn btn-primary" 
+                                                         style={{ whiteSpace: 'nowrap' }}
+                                                     >
+                                                         Save ID
+                                                     </button>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                         <div style={{ opacity: 0.5, pointerEvents: 'none' }}>
+                                             <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '10px' }}>Online Card Payments (Via Admin)</h3>
+                                             <div style={{ padding: '15px', background: 'var(--glass-accent)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                                                 <p style={{ fontSize: '0.85rem' }}>Automated payouts via Razorpay/Stripe are managed by the platform administrator. You will receive these payouts weekly.</p>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </motion.div>
+                             )}
+
 
                             {activeTab === 'menu' && (
                                 <motion.div key="menu" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
@@ -392,7 +476,11 @@ const BusinessDashboard = () => {
                                                                     <p style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 800 }}>₹{item.price.toFixed(2)}</p>
                                                                 </div>
                                                             </div>
-                                                            <button onClick={() => handleDeleteMenuItem(item._id)} style={{ background: 'rgba(255, 71, 87, 0.1)', color: 'var(--primary)', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, transition: 'all 0.2s' }}>Delete</button>
+                                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                                <button onClick={() => handleEditMenuItem(item)} style={{ background: 'rgba(30, 144, 255, 0.1)', color: '#1e90ff', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700 }}>Edit</button>
+                                                                <button onClick={() => handleDeleteMenuItem(item._id)} style={{ background: 'rgba(255, 71, 87, 0.1)', color: 'var(--primary)', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700 }}>Delete</button>
+                                                            </div>
+
                                                         </div>
                                                     ))
                                                 )}
@@ -400,8 +488,9 @@ const BusinessDashboard = () => {
                                         </div>
 
                                         {/* Right Side: Add New Form */}
-                                        <div style={{ background: 'var(--glass-bg)', padding: '30px', borderRadius: '20px', border: '1px solid var(--glass-border)' }}>
-                                            <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)', fontWeight: 800 }}>Publish New Item</h3>
+                                        <div style={{ background: 'var(--glass-bg)', padding: '30px', borderRadius: '20px', border: editingItem ? '1px solid #1e90ff' : '1px solid var(--glass-border)' }}>
+                                            <h3 style={{ fontSize: '1.4rem', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--glass-border)', fontWeight: 800 }}>{editingItem ? 'Edit Item Details' : 'Publish New Item'}</h3>
+
                                             <form onSubmit={handleAddMenuItem}>
                                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                                     <div className="input-group">
@@ -431,7 +520,9 @@ const BusinessDashboard = () => {
                                                     <input type="file" className="input-glass" style={{ padding: '8px' }} onChange={(e) => uploadFileHandler(e, 'menu')} />
                                                     {uploadingMenu && <span style={{ color: 'var(--secondary)', fontSize: '0.9rem', marginTop: '4px', display: 'block' }}>Uploading securely...</span>}
                                                 </div>
-                                                <button type="submit" className="btn btn-secondary" style={{ width: '100%', marginTop: '10px' }}>+ Publish to Live Menu</button>
+                                                <button type="submit" className="btn btn-secondary" style={{ width: '100%', marginTop: '10px', background: editingItem ? '#1e90ff' : 'var(--secondary)' }}>{editingItem ? 'Update Menu Item' : '+ Publish to Live Menu'}</button>
+                                                {editingItem && <button type="button" onClick={() => { setEditingItem(null); setItemMenuName(''); setItemDesc(''); setItemPrice(''); setItemImage(''); }} style={{ width: '100%', marginTop: '10px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', padding: '8px', borderRadius: '12px', cursor: 'pointer' }}>Cancel Edit</button>}
+
                                             </form>
                                         </div>
                                     </div>
@@ -573,9 +664,65 @@ const BusinessDashboard = () => {
                                             </div>
                                         ))}
                                     </div>
-                                </motion.div>
-                            )}
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'inventory' && (
+                                 <motion.div key="inventory" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <InventoryPanel menuItems={menuItems} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'customers' && (
+                                 <motion.div key="customers" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <CustomersPanel orders={orders} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'analytics' && (
+                                 <motion.div key="analytics" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <AnalyticsPanel orders={orders} menuItems={menuItems} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'offers' && (
+                                 <motion.div key="offers" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <OffersPanel menuItems={menuItems} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'notifications' && (
+                                 <motion.div key="notifications" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <NotificationsPanel orders={orders} reservations={reservations} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'delivery' && (
+                                 <motion.div key="delivery" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <DeliveryPanel orders={orders} updateOrderStatus={updateOrderStatus} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'staff' && (
+                                 <motion.div key="staff" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <StaffPanel />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'reviews' && (
+                                 <motion.div key="reviews" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <ReviewsPanel restaurant={restaurant} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'security' && (
+                                 <motion.div key="security" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <SecurityPanel />
+                                 </motion.div>
+                             )}
+
                         </AnimatePresence>
+
                     </div>
                 </div>
             )}

@@ -13,6 +13,8 @@ import Restaurant from './pages/Restaurant';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import AdminDashboard from './pages/AdminDashboard';
+import PaymentSuccess from './pages/PaymentSuccess';
+
 
 // Persona-based separations
 import CustomerProfile from './pages/CustomerProfile';
@@ -85,7 +87,9 @@ const AppContent = () => {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
         </Routes>
+
       </main>
     </>
   );

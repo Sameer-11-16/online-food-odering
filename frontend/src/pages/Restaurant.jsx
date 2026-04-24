@@ -3,13 +3,16 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import MenuItemCard from '../components/MenuItemCard';
 import DeliveryMap from '../components/DeliveryMap';
-import { ArrowLeft, Calendar, UtensilsCrossed } from 'lucide-react';
+import { ArrowLeft, Calendar, UtensilsCrossed, Navigation, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import useGeoLocation from '../hooks/useGeoLocation';
+import { getDistanceKm, MAX_DELIVERY_KM } from '../utils/distance';
 
 const Restaurant = () => {
     const { id } = useParams();
     const { userInfo } = useAuth();
+    const userLocation = useGeoLocation();
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -104,10 +107,22 @@ const Restaurant = () => {
     if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}>Loading...</div>;
     if (!restaurant) return <div style={{ textAlign: 'center', padding: '100px' }}>Restaurant not found</div>;
 
+    const dist = userLocation.lat && restaurant?.location?.lat 
+        ? getDistanceKm(userLocation.lat, userLocation.lng, restaurant.location.lat, restaurant.location.lng) 
+        : null;
+    const tooFar = dist !== null && dist > MAX_DELIVERY_KM;
+
+
     return (
         <div style={{ paddingBottom: '60px' }}>
             {/* Hero Section */}
-            <div className="glass-panel" style={{ padding: '40px', marginBottom: '40px', background: 'linear-gradient(to right, var(--glass-bg), rgba(255, 71, 87, 0.05))' }}>
+            <div className="glass-panel" style={{ padding: '40px', marginBottom: '40px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(to right, var(--glass-bg), rgba(255, 71, 87, 0.05))' }}>
+                {tooFar && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, background: 'rgba(255, 71, 87, 0.9)', padding: '8px', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 800, zIndex: 10 }}>
+                        <AlertTriangle size={16} /> Out of Delivery Range — Orders Disabled ({dist.toFixed(1)} km away)
+                    </div>
+                )}
+
                 <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
                     <ArrowLeft size={16} /> Back to restaurants
                 </Link>
@@ -168,8 +183,8 @@ const Restaurant = () => {
                             ) : (
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
                                     {menu.map((item, i) => (
-                                        <motion.div key={item._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                                            <MenuItemCard item={item} />
+                                        <motion.div key={item._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} style={{ opacity: tooFar ? 0.6 : 1, pointerEvents: tooFar ? 'none' : 'auto' }}>
+                                            <MenuItemCard item={item} disabled={tooFar} />
                                         </motion.div>
                                     ))}
                                 </div>

@@ -8,7 +8,7 @@ import axios from 'axios';
 
 import API_BASE_URL from '../apiConfig';
 
-const MenuItemCard = ({ item: initialItem }) => {
+const MenuItemCard = ({ item: initialItem, disabled }) => {
     const [item, setItem] = useState(initialItem);
     const { addToCart, cartItems } = useCart();
     const { userInfo } = useAuth();
@@ -126,22 +126,24 @@ const MenuItemCard = ({ item: initialItem }) => {
                             ) : (
                                 <motion.button 
                                     key="add"
-                                    whileTap={{ scale: 0.9 }}
+                                    whileTap={{ scale: disabled ? 1 : 0.9 }}
                                     onClick={handleAdd}
+                                    disabled={disabled}
                                     style={{ 
-                                        background: 'var(--glass-bg)', 
-                                        color: 'var(--primary)', 
-                                        border: '1px solid var(--primary)', 
+                                        background: disabled ? 'rgba(255,255,255,0.1)' : 'var(--glass-bg)', 
+                                        color: disabled ? 'rgba(255,255,255,0.5)' : 'var(--primary)', 
+                                        border: `1px solid ${disabled ? 'rgba(255,255,255,0.2)' : 'var(--primary)'}`, 
                                         padding: '6px 24px', 
                                         borderRadius: '12px', 
                                         fontWeight: 800,
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                                        cursor: 'pointer',
+                                        boxShadow: disabled ? 'none' : '0 4px 15px rgba(0,0,0,0.2)',
+                                        cursor: disabled ? 'not-allowed' : 'pointer',
                                         backdropFilter: 'blur(10px)'
                                     }}
                                 >
-                                    ADD {qty > 0 && <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary)', color: 'white', width: '20px', height: '20px', borderRadius: '50%', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{qty}</span>}
+                                    {disabled ? 'UNAVAILABLE' : 'ADD'} {qty > 0 && <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary)', color: 'white', width: '20px', height: '20px', borderRadius: '50%', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{qty}</span>}
                                 </motion.button>
+
                             )}
                         </AnimatePresence>
                     </div>
