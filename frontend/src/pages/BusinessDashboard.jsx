@@ -539,6 +539,25 @@ const BusinessDashboard = () => {
                                                     </select>
                                                 </div>
                                                 <div className="input-group">
+                                                    <label className="input-label">Food Type</label>
+                                                    <div style={{ display: 'flex', gap: '20px', padding: '10px 0' }}>
+                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600 }}>
+                                                            <input type="radio" name="foodType" value="Veg" checked={itemFoodType === 'Veg'} onChange={e => setItemFoodType(e.target.value)} />
+                                                            <div style={{ width: '18px', height: '18px', border: '2px solid #27ae60', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px' }}>
+                                                                <div style={{ width: '10px', height: '10px', background: '#27ae60', borderRadius: '50%' }}></div>
+                                                            </div>
+                                                            Veg
+                                                        </label>
+                                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600 }}>
+                                                            <input type="radio" name="foodType" value="Non-Veg" checked={itemFoodType === 'Non-Veg'} onChange={e => setItemFoodType(e.target.value)} />
+                                                            <div style={{ width: '18px', height: '18px', border: '2px solid #c0392b', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px' }}>
+                                                                <div style={{ width: '10px', height: '10px', background: '#c0392b', borderRadius: '50%' }}></div>
+                                                            </div>
+                                                            Non-Veg
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div className="input-group">
                                                     <label className="input-label">Food Image</label>
                                                     <input type="file" className="input-glass" style={{ padding: '8px' }} onChange={(e) => uploadFileHandler(e, 'menu')} />
                                                     {uploadingMenu && <span style={{ color: 'var(--secondary)', fontSize: '0.9rem', marginTop: '4px', display: 'block' }}>Uploading securely...</span>}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,10 @@ const MenuItemCard = ({ item: initialItem, disabled }) => {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        setItem(initialItem);
+    }, [initialItem]);
 
     const isInCart = cartItems.find(x => x._id === item._id);
     const qty = isInCart ? isInCart.qty : 0;
