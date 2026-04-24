@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut, Home, MapPin } from 'lucide-react';
+import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut, Home, MapPin, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -8,6 +8,7 @@ import useGeoLocation from '../hooks/useGeoLocation';
 
 const Navbar = () => {
   const [searchKw, setSearchKw] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cartItems, clearCart } = useCart();
   const { userInfo, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -41,6 +42,12 @@ const Navbar = () => {
     e.preventDefault();
     if(searchKw.trim()) navigate(`/search?q=${searchKw}`);
     else navigate('/');
+    setMobileMenuOpen(false);
+  }
+
+  const handleMobileNav = (path) => {
+    navigate(path);
+    setMobileMenuOpen(false);
   }
 
   const logoutHandler = () => {
@@ -127,9 +134,75 @@ const Navbar = () => {
             <button onClick={toggleTheme} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
+
+            {/* Mobile Menu Toggle Button */}
+            <button className="mobile-only" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', alignItems: 'center', marginLeft: '8px' }}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+          <div style={{ position: 'absolute', top: '80px', left: 0, width: '100%', background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--glass-border)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', zIndex: 99, boxShadow: 'var(--glass-shadow)' }}>
+            
+            {userInfo?.role !== 'restaurant_owner' && (
+                <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--glass-accent)', padding: '10px 16px', borderRadius: '12px', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+                    <MapPin size={16} color="var(--primary)" />
+                    <span>{address}</span>
+                </div>
+
+                <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', background: 'var(--glass-accent)', padding: '10px 16px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                    <Search size={18} color="var(--text-secondary)" style={{ marginRight: '8px' }} />
+                    <input type="text" placeholder="Search food..." value={searchKw} onChange={e=>setSearchKw(e.target.value)} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', outline: 'none', width: '100%' }} />
+                </form>
+                </>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px' }}>
+                {userInfo?.role !== 'restaurant_owner' && (
+                    <>
+                        <button onClick={() => handleMobileNav('/')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', padding: '8px 0' }}>
+                            <Home size={22} /> Home
+                        </button>
+                        <button onClick={() => handleMobileNav('/cart')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', padding: '8px 0' }}>
+                            <div style={{ position: 'relative' }}>
+                                <ShoppingBag size={22} />
+                                {cartCount > 0 && <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary)', color: 'white', fontSize: '0.7rem', fontWeight: 700, padding: '2px 6px', borderRadius: '20px' }}>{cartCount}</span>}
+                            </div>
+                            Cart
+                        </button>
+                    </>
+                )}
+                
+                {userInfo ? (
+                    <>
+                        {userInfo.role === 'restaurant_owner' ? (
+                            <button onClick={() => handleMobileNav('/dashboard')} style={{ background: 'none', border: 'none', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', padding: '8px 0' }}>
+                                <Utensils size={22} /> Business Command
+                            </button>
+                        ) : (
+                            <button onClick={() => handleMobileNav('/user-dashboard')} style={{ background: 'none', border: 'none', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', padding: '8px 0' }}>
+                                <User size={22} /> My Activity
+                            </button>
+                        )}
+                        <button onClick={() => handleMobileNav('/profile')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', padding: '8px 0' }}>
+                            <User size={22} /> Account
+                        </button>
+                        <button onClick={() => { logoutHandler(); setMobileMenuOpen(false); }} style={{ background: 'none', border: 'none', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', padding: '8px 0' }}>
+                            <LogOut size={22} /> Logout
+                        </button>
+                    </>
+                ) : (
+                    <button onClick={() => handleMobileNav('/login')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', padding: '8px 0' }}>
+                        <User size={22} /> Sign In
+                    </button>
+                )}
+            </div>
+          </div>
+      )}
     </nav>
   );
 };
