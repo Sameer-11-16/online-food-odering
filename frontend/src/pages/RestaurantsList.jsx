@@ -93,8 +93,9 @@ const RestaurantsList = () => {
                             </div>
                         </Link>
                     </motion.div>
-                    );
-                })}
+                        );
+                    })
+                )}
             </div>
         </motion.div>
     );
