@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Skeleton, { MenuItemSkeleton } from '../components/Skeleton';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import MenuItemCard from '../components/MenuItemCard';
@@ -104,7 +105,24 @@ const Restaurant = () => {
         }
     };
 
-    if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}>Loading...</div>;
+    if (loading) return (
+        <div className="container" style={{ paddingTop: '100px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '30px' }} className="responsive-header">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <Skeleton width="60%" height="48px" borderRadius="12px" />
+                    <Skeleton width="100%" height="100px" borderRadius="12px" />
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                        <Skeleton width="100px" height="40px" />
+                        <Skeleton width="100px" height="40px" />
+                    </div>
+                </div>
+                <Skeleton width="100%" height="250px" borderRadius="24px" />
+            </div>
+            <div className="card-grid" style={{ marginTop: '50px' }}>
+                {[...Array(4)].map((_, i) => <MenuItemSkeleton key={i} />)}
+            </div>
+        </div>
+    );
     if (!restaurant) return <div style={{ textAlign: 'center', padding: '100px' }}>Restaurant not found</div>;
 
     const dist = userLocation.lat && restaurant?.location?.lat 

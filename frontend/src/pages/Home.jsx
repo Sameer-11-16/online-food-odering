@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { CardSkeleton } from '../components/Skeleton';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -12,6 +13,7 @@ import { MapPin, Navigation } from 'lucide-react';
 const Home = () => {
 
     const [restaurants, setRestaurants] = useState([]);
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchQuery = searchParams.get('search') || '';
@@ -28,8 +30,10 @@ const Home = () => {
             try {
                 const { data } = await axios.get('/api/restaurants');
                 setRestaurants(data);
+                setLoading(false);
             } catch (error) {
                 console.error(error);
+                setLoading(false);
             }
         };
         fetchRestaurants();
@@ -88,7 +92,12 @@ const Home = () => {
                     animate={{ opacity: 1 }} 
                     transition={{ delay: 0.4 }}
                     className="card-grid">
-                    {filteredRestaurants.slice(0, 4).map((restaurant, index) => {
+                    {loading ? (
+                        [...Array(4)].map((_, i) => <CardSkeleton key={i} />)
+                    ) : filteredRestaurants.length === 0 ? (
+                        <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No restaurants found matching your search.</p>
+                    ) : (
+                        filteredRestaurants.slice(0, 4).map((restaurant, index) => {
                         const dist = getDistance(restaurant);
                         const tooFar = dist !== null && dist > MAX_DELIVERY_KM;
                         return (

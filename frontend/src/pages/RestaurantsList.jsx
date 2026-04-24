@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { CardSkeleton } from '../components/Skeleton';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -31,7 +32,16 @@ const RestaurantsList = () => {
         fetchRestaurants();
     }, []);
 
-    if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}>Loading restaurants...</div>;
+    if (loading) return (
+        <div style={{ paddingBottom: '60px' }}>
+            <div className="responsive-header">
+                <h1 style={{ fontWeight: 800 }}>All Restaurants</h1>
+            </div>
+            <div className="card-grid">
+                {[...Array(8)].map((_, i) => <CardSkeleton key={i} />)}
+            </div>
+        </div>
+    );
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '60px' }}>
