@@ -20,6 +20,7 @@ import ReviewsPanel from '../components/dashboard/ReviewsPanel';
 import SecurityPanel from '../components/dashboard/SecurityPanel';
 import ReceiptsPanel from '../components/dashboard/ReceiptsPanel';
 import API_BASE_URL from '../apiConfig';
+import useGeoLocation from '../hooks/useGeoLocation';
 
 const BusinessDashboard = () => {
 
@@ -29,6 +30,7 @@ const BusinessDashboard = () => {
     const [restaurant, setRestaurant] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
+    const userLocation = useGeoLocation();
 
     // Create Restaurant State
     const [name, setName] = useState('');
@@ -169,7 +171,14 @@ const BusinessDashboard = () => {
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
             const { data } = await axios.post('/api/restaurants', {
-                name, description, address, imageUrl: image
+                name, 
+                description, 
+                address, 
+                imageUrl: image,
+                location: {
+                    lat: userLocation.lat,
+                    lng: userLocation.lng
+                }
             }, config);
             setRestaurant(data);
             toast.success('Restaurant profile created successfully!');

@@ -69,7 +69,7 @@ const getRestaurantMenu = async (req, res) => {
 // @route   POST /api/restaurants
 // @access  Private/RestaurantOwner
 const createRestaurant = async (req, res) => {
-    const { name, description, imageUrl, address } = req.body;
+    const { name, description, imageUrl, address, location } = req.body;
 
     try {
         const restaurant = new Restaurant({
@@ -78,6 +78,7 @@ const createRestaurant = async (req, res) => {
             description,
             imageUrl,
             address,
+            location
         });
 
         const createdRestaurant = await restaurant.save();
