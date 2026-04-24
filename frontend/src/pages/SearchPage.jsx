@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import MenuItemCard from '../components/MenuItemCard';
+import { MenuItemSkeleton } from '../components/Skeleton';
 import API_BASE_URL from '../apiConfig';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
@@ -34,7 +35,16 @@ const SearchPage = () => {
         fetchResults();
     }, [searchQuery, navigate]);
 
-    if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}>Searching for delicious food...</div>;
+    if (loading) return (
+        <div style={{ paddingBottom: '60px' }}>
+            <div className="responsive-header">
+                <h1 style={{ fontWeight: 800 }}>Searching for "{searchQuery}"</h1>
+            </div>
+            <div className="card-grid">
+                {[...Array(6)].map((_, i) => <MenuItemSkeleton key={i} />)}
+            </div>
+        </div>
+    );
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: '60px' }}>
