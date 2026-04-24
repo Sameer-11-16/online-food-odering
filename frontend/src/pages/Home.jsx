@@ -137,8 +137,8 @@ const Home = () => {
                                 </div>
                             </Link>
                         </motion.div>
-                        );
-                    })}
+                        )
+                    )}
                 </motion.div>
             </section>
         </motion.div>
