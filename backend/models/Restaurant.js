@@ -1,5 +1,21 @@
 const mongoose = require('mongoose');
 
+const reviewSchema = mongoose.Schema(
+    {
+        name: { type: String, required: true },
+        rating: { type: Number, required: true },
+        comment: { type: String, required: true },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User',
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
 const restaurantSchema = mongoose.Schema(
     {
         owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -7,6 +23,7 @@ const restaurantSchema = mongoose.Schema(
         description: { type: String },
         imageUrl: { type: String },
         address: { type: String, required: true },
+        reviews: [reviewSchema],
         rating: { type: Number, default: 0 },
         numReviews: { type: Number, default: 0 },
     },
@@ -14,3 +31,4 @@ const restaurantSchema = mongoose.Schema(
 );
 
 module.exports = mongoose.model('Restaurant', restaurantSchema);
+

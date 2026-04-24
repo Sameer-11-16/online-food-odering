@@ -4,8 +4,10 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
+import API_BASE_URL from '../apiConfig';
 
 const Home = () => {
+
     const [restaurants, setRestaurants] = useState([]);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -69,7 +71,8 @@ const Home = () => {
                             whileHover={{ y: -5 }}
                         >
                             <Link to={`/restaurant/${restaurant._id}`} className="glass-panel" style={{ overflow: 'hidden', display: 'block', height: '100%' }}>
-                                <div style={{ height: '200px', background: `url(${restaurant.imageUrl || 'default'}) center/cover`, backgroundColor: 'rgba(255,255,255,0.05)', position: 'relative' }}>
+                                <div style={{ height: '200px', background: `url(${restaurant.imageUrl ? (restaurant.imageUrl.startsWith('http') ? restaurant.imageUrl : API_BASE_URL + restaurant.imageUrl) : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5'}) center/cover`, backgroundColor: 'rgba(255,255,255,0.05)', position: 'relative' }}>
+
                                     <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 8px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
                                         ⭐ {restaurant.rating}
                                     </div>

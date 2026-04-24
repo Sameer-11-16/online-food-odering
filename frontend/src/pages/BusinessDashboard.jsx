@@ -9,8 +9,10 @@ import { Utensils, Package, Calendar, Settings, Activity, ChefHat, CreditCard, B
 import OverviewPanel from '../components/dashboard/OverviewPanel';
 import KitchenPanel from '../components/dashboard/KitchenPanel';
 import SettingsPanel from '../components/dashboard/SettingsPanel';
+import API_BASE_URL from '../apiConfig';
 
 const BusinessDashboard = () => {
+
     const { userInfo, logout } = useAuth();
     const navigate = useNavigate();
     
@@ -256,7 +258,7 @@ const BusinessDashboard = () => {
                             <label className="input-label">Restaurant Banner Image</label>
                             <input type="file" className="input-glass" onChange={(e) => uploadFileHandler(e, 'restaurant')} />
                             {uploading && <span style={{ color: 'var(--secondary)', fontSize: '0.9rem', marginTop: '4px', display: 'block' }}>Uploading server image...</span>}
-                            {image && <div style={{ marginTop: '10px', height: '100px', width: '200px', backgroundImage: `url(${image})`, backgroundSize: 'cover', borderRadius: '12px' }}></div>}
+                            {image && <div style={{ marginTop: '10px', height: '100px', width: '200px', backgroundImage: `url(${image.startsWith('http') ? image : API_BASE_URL + image})`, backgroundSize: 'cover', borderRadius: '12px' }}></div>}
                         </div>
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Create Profile and Launch</button>
                     </form>
@@ -291,7 +293,7 @@ const BusinessDashboard = () => {
                         overflowY: 'auto' 
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--glass-border)' }}>
-                            {restaurant.imageUrl && <div style={{ width: '50px', height: '50px', borderRadius: '12px', backgroundImage: `url(${restaurant.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}></div>}
+                            {restaurant.imageUrl && <div style={{ width: '50px', height: '50px', borderRadius: '12px', backgroundImage: `url(${restaurant.imageUrl.startsWith('http') ? restaurant.imageUrl : API_BASE_URL + restaurant.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}></div>}
                             <div style={{ overflow: 'hidden' }}>
                                 <h3 style={{ fontSize: '1.1rem', color: 'var(--primary)', fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{restaurant.name}</h3>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.8.5rem', marginTop: '2px' }}>Admin / Owner</p>
@@ -384,7 +386,7 @@ const BusinessDashboard = () => {
                                                     menuItems.map(item => (
                                                         <div key={item._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--glass-accent)', padding: '16px', borderRadius: '16px', border: '1px solid var(--glass-border)', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                                                {item.imageUrl && <div style={{ width: '50px', height: '50px', borderRadius: '12px', backgroundImage: `url(${item.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0 }}></div>}
+                                                                {item.imageUrl && <div style={{ width: '50px', height: '50px', borderRadius: '12px', backgroundImage: `url(${item.imageUrl.startsWith('http') ? item.imageUrl : API_BASE_URL + item.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', flexShrink: 0 }}></div>}
                                                                 <div>
                                                                     <h4 style={{ fontSize: '1.05rem', fontWeight: 800, marginBottom: '2px' }}>{item.name}</h4>
                                                                     <p style={{ fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 800 }}>₹{item.price.toFixed(2)}</p>

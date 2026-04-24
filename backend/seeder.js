@@ -52,8 +52,12 @@ const importData = async () => {
                 description: 'Authentic Italian cuisine crafted with love and passion.',
                 imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3',
                 address: '123 Main St, NY',
-                rating: 4.8,
-                numReviews: 12
+                reviews: [
+                    { name: 'John Doe', rating: 5, comment: 'Amazing pasta!', user: owner2 },
+                    { name: 'Jane Smith', rating: 4, comment: 'Great atmosphere.', user: owner1 }
+                ],
+                rating: 4.5,
+                numReviews: 2
             },
             {
                 owner: owner2,
@@ -61,8 +65,11 @@ const importData = async () => {
                 description: 'Fresh sushi and authentic ramen bowls.',
                 imageUrl: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?ixlib=rb-4.0.3',
                 address: '456 Sushi Ave, NY',
-                rating: 4.9,
-                numReviews: 24
+                reviews: [
+                    { name: 'Alice Wong', rating: 5, comment: 'Best sushi in town!', user: owner1 }
+                ],
+                rating: 5.0,
+                numReviews: 1
             },
             {
                 owner: owner1,
@@ -70,24 +77,60 @@ const importData = async () => {
                 description: 'Classic American smash burgers and fries.',
                 imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3',
                 address: '789 Burger Blvd, NY',
-                rating: 4.5,
-                numReviews: 8
+                reviews: [],
+                rating: 0,
+                numReviews: 0
             }
         ]);
+
 
         const rest1 = createdRestaurants[0]._id;
         const rest2 = createdRestaurants[1]._id;
 
         await MenuItem.insertMany([
-            { restaurant: rest1, name: 'Margherita Pizza', description: 'Classic tomato, fresh mozzarella, and aromatic basil.', price: 14.99, category: 'Pizza' },
-            { restaurant: rest1, name: 'Truffle Pasta', description: 'Handmade fettuccine enveloped in rich black truffle cream.', price: 19.50, category: 'Pasta' },
+            { 
+                restaurant: rest1, 
+                name: 'Margherita Pizza', 
+                description: 'Classic tomato, fresh mozzarella, and aromatic basil.', 
+                price: 14.99, 
+                category: 'Pizza',
+                reviews: [
+                    { name: 'Alice Wong', rating: 5, comment: 'Best pizza ever!', user: owner1 }
+                ],
+                rating: 5.0,
+                numReviews: 1
+            },
+            { 
+                restaurant: rest1, 
+                name: 'Truffle Pasta', 
+                description: 'Handmade fettuccine enveloped in rich black truffle cream.', 
+                price: 19.50, 
+                category: 'Pasta',
+                reviews: [
+                    { name: 'John Doe', rating: 4, comment: 'Very creamy.', user: owner2 }
+                ],
+                rating: 4.0,
+                numReviews: 1
+            },
             { restaurant: rest1, name: 'Tiramisu', description: 'Traditional coffee-flavored Italian dessert.', price: 8.00, category: 'Dessert' },
             { restaurant: rest1, name: 'Garlic Bread', description: 'Toasted ciabatta with slow-roasted garlic herb butter.', price: 5.50, category: 'Starter' },
             
-            { restaurant: rest2, name: 'Spicy Tuna Roll', description: 'Fresh tuna with spicy mayo and cucumber.', price: 12.99, category: 'Sushi' },
+            { 
+                restaurant: rest2, 
+                name: 'Spicy Tuna Roll', 
+                description: 'Fresh tuna with spicy mayo and cucumber.', 
+                price: 12.99, 
+                category: 'Sushi',
+                reviews: [
+                    { name: 'Jane Smith', rating: 5, comment: 'So fresh!', user: owner1 }
+                ],
+                rating: 5.0,
+                numReviews: 1
+            },
             { restaurant: rest2, name: 'Tonkotsu Ramen', description: 'Rich pork broth with noodles, egg, and chashu.', price: 16.50, category: 'Ramen' },
             { restaurant: rest2, name: 'Miso Soup', description: 'Warm miso broth with tofu and seaweed.', price: 4.00, category: 'Appetizer' }
         ]);
+
 
         console.log('Data Imported!');
         process.exit();

@@ -132,6 +132,93 @@ const updateRestaurant = async (req, res) => {
     }
 };
 
+
+// @desc    Create new review
+// @route   POST /api/restaurants/:id/reviews
+// @access  Private
+const createRestaurantReview = async (req, res) => {
+    const { rating, comment } = req.body;
+
+    try {
+        const restaurant = await Restaurant.findById(req.params.id);
+
+        if (restaurant) {
+            const alreadyReviewed = restaurant.reviews.find(
+                (r) => r.user.toString() === req.user._id.toString()
+            );
+
+            if (alreadyReviewed) {
+                return res.status(400).json({ message: 'Restaurant already reviewed' });
+            }
+
+            const review = {
+                name: req.user.name,
+                rating: Number(rating),
+                comment,
+                user: req.user._id,
+            };
+
+            restaurant.reviews.push(review);
+
+            restaurant.numReviews = restaurant.reviews.length;
+
+            restaurant.rating =
+                restaurant.reviews.reduce((acc, item) => item.rating + acc, 0) /
+                restaurant.reviews.length;
+
+            await restaurant.save();
+            res.status(201).json({ message: 'Review added' });
+        } else {
+            res.status(404).json({ message: 'Restaurant not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Create new menu item review
+// @route   POST /api/restaurants/:id/menu/:menuId/reviews
+// @access  Private
+const createMenuItemReview = async (req, res) => {
+    const { rating, comment } = req.body;
+
+    try {
+        const menuItem = await MenuItem.findById(req.params.menuId);
+
+        if (menuItem) {
+            const alreadyReviewed = menuItem.reviews.find(
+                (r) => r.user.toString() === req.user._id.toString()
+            );
+
+            if (alreadyReviewed) {
+                return res.status(400).json({ message: 'Menu item already reviewed' });
+            }
+
+            const review = {
+                name: req.user.name,
+                rating: Number(rating),
+                comment,
+                user: req.user._id,
+            };
+
+            menuItem.reviews.push(review);
+
+            menuItem.numReviews = menuItem.reviews.length;
+
+            menuItem.rating =
+                menuItem.reviews.reduce((acc, item) => item.rating + acc, 0) /
+                menuItem.reviews.length;
+
+            await menuItem.save();
+            res.status(201).json({ message: 'Review added' });
+        } else {
+            res.status(404).json({ message: 'Menu item not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getRestaurants,
     getRestaurantById,
@@ -140,4 +227,7 @@ module.exports = {
     createMenuItem,
     deleteMenuItem,
     updateRestaurant,
+    createRestaurantReview,
+    createMenuItemReview,
 };
+

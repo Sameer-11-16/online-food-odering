@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Restaurant from './pages/Restaurant';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -23,7 +24,8 @@ const AppContent = () => {
   const location = useLocation();
   const { userInfo } = useAuth();
   const isWideLayout = ['/dashboard', '/business-profile', '/admin'].includes(location.pathname);
-  const hideNavbar = ['/login', '/register'].includes(location.pathname);
+  const hideNavbar = ['/login', '/register', '/forgot-password'].includes(location.pathname);
+
 
   useEffect(() => {
     if (userInfo) {
@@ -70,8 +72,10 @@ const AppContent = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           {/* Customer Routes */}
+
           <Route path="/profile" element={<CustomerProfile />} />
           <Route path="/user-dashboard" element={<CustomerDashboard />} />
           

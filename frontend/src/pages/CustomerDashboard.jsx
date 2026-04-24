@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { socket } from '../socket';
 import { toast } from 'react-hot-toast';
+import API_BASE_URL from '../apiConfig';
 
 const OrderTracker = ({ status }) => {
+
     const steps = ['Pending', 'Preparing', 'Out for Delivery', 'Delivered'];
     let currentStep = steps.indexOf(status);
     if (currentStep === -1) currentStep = 0;
@@ -104,7 +106,7 @@ const CustomerDashboard = () => {
                                             width: '45px', 
                                             height: '45px', 
                                             borderRadius: '8px', 
-                                            background: item.image && item.image !== 'default' ? `url(${item.image}) no-repeat center/cover` : 'var(--primary)',
+                                            background: item.image && item.image !== 'default' ? `url(${item.image.startsWith('http') ? item.image : API_BASE_URL + item.image}) no-repeat center/cover` : 'var(--primary)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',

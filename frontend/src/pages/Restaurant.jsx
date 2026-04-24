@@ -13,7 +13,7 @@ const Restaurant = () => {
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('menu'); // 'menu' or 'booking'
+    const [activeTab, setActiveTab] = useState('menu'); // 'menu', 'booking', or 'reviews'
 
     // Booking state
     const [date, setDate] = useState('');
@@ -21,6 +21,11 @@ const Restaurant = () => {
     const [guests, setGuests] = useState(2);
     const [specialRequests, setSpecialRequests] = useState('');
     const [bookingStatus, setBookingStatus] = useState(null);
+
+    // Review state
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState('');
+    const [reviewStatus, setReviewStatus] = useState(null);
 
     useEffect(() => {
         const fetchRestaurantData = async () => {
@@ -68,6 +73,34 @@ const Restaurant = () => {
         }
     };
 
+    const submitReviewHandler = async (e) => {
+        e.preventDefault();
+        if (!userInfo) {
+            setReviewStatus({ type: 'error', message: 'You must log in to write a review.' });
+            return;
+        }
+
+        try {
+            const config = {
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}` 
+                }
+            };
+            await axios.post(`/api/restaurants/${id}/reviews`, { rating, comment }, config);
+            
+            setReviewStatus({ type: 'success', message: 'Review submitted successfully!' });
+            setRating(5);
+            setComment('');
+            
+            // Refresh restaurant data to show new review
+            const { data: restData } = await axios.get(`/api/restaurants/${id}`);
+            setRestaurant(restData);
+        } catch (error) {
+            setReviewStatus({ type: 'error', message: error.response?.data?.message || 'Failed to submit review' });
+        }
+    };
+
     if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}>Loading...</div>;
     if (!restaurant) return <div style={{ textAlign: 'center', padding: '100px' }}>Restaurant not found</div>;
 
@@ -85,7 +118,7 @@ const Restaurant = () => {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', backgroundColor: 'var(--primary)', color: 'white', padding: '8px 16px', borderRadius: '12px', fontWeight: 700, gap: '6px', alignItems: 'center' }}>
-                            ⭐ {restaurant.rating}
+                            ⭐ {restaurant.rating.toFixed(1)}
                         </div>
                         <p style={{ marginTop: '8px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Reviews: {restaurant.numReviews}</p>
                     </div>
@@ -112,6 +145,11 @@ const Restaurant = () => {
                     style={{ padding: '8px 24px', borderRadius: '20px', border: 'none', background: activeTab === 'booking' ? 'var(--primary)' : 'transparent', color: activeTab === 'booking' ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s' }}>
                     <Calendar size={18} /> Book a Table
                 </button>
+                <button 
+                    onClick={() => setActiveTab('reviews')}
+                    style={{ padding: '8px 24px', borderRadius: '20px', border: 'none', background: activeTab === 'reviews' ? 'var(--primary)' : 'transparent', color: activeTab === 'reviews' ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s' }}>
+                    ⭐ Reviews
+                </button>
             </div>
 
             {/* Content Section */}
@@ -137,7 +175,7 @@ const Restaurant = () => {
                                 </div>
                             )}
                         </motion.div>
-                    ) : (
+                    ) : activeTab === 'booking' ? (
                         <motion.div 
                             key="booking"
                             initial={{ opacity: 0, x: 20 }}
@@ -179,10 +217,77 @@ const Restaurant = () => {
                                 </button>
                             </form>
                         </motion.div>
+                    ) : (
+                        <motion.div 
+                            key="reviews"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', alignItems: 'start' }}>
+                                {/* Review Form */}
+                                <div className="glass-panel" style={{ padding: '30px' }}>
+                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '20px' }}>Write a Review</h3>
+                                    {reviewStatus && (
+                                        <div style={{ padding: '10px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem', background: reviewStatus.type === 'success' ? 'rgba(46, 213, 115, 0.1)' : 'rgba(255, 71, 87, 0.1)', color: reviewStatus.type === 'success' ? 'var(--secondary)' : 'var(--primary)' }}>
+                                            {reviewStatus.message}
+                                        </div>
+                                    )}
+                                    {userInfo ? (
+                                        <form onSubmit={submitReviewHandler}>
+                                            <div className="input-group">
+                                                <label className="input-label">Rating</label>
+                                                <select className="input-glass" value={rating} onChange={(e) => setRating(e.target.value)}>
+                                                    <option value="5">5 - Excellent</option>
+                                                    <option value="4">4 - Very Good</option>
+                                                    <option value="3">3 - Good</option>
+                                                    <option value="2">2 - Fair</option>
+                                                    <option value="1">1 - Poor</option>
+                                                </select>
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">Comment</label>
+                                                <textarea className="input-glass" rows="4" value={comment} onChange={(e) => setComment(e.target.value)} required placeholder="Share your experience..."></textarea>
+                                            </div>
+                                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Submit Review</button>
+                                        </form>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            Please <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>login</Link> to write a review.
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Review List */}
+                                <div>
+                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '20px' }}>Customer Reviews</h3>
+                                    {restaurant.reviews.length === 0 ? (
+                                        <div className="glass-panel" style={{ padding: '30px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            No reviews yet. Be the first to review!
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                            {restaurant.reviews.map((review) => (
+                                                <div key={review._id} className="glass-panel" style={{ padding: '20px' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                                        <strong style={{ fontSize: '1.1rem' }}>{review.name}</strong>
+                                                        <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{'⭐'.repeat(Math.round(review.rating))}</span>
+                                                    </div>
+                                                    <p style={{ color: 'var(--text-secondary)', marginBottom: '10px', fontSize: '0.95rem' }}>{review.comment}</p>
+                                                    <small style={{ color: 'var(--text-tertiary)' }}>{new Date(review.createdAt).toLocaleDateString()}</small>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </div>
         </div>
+
     );
 };
 

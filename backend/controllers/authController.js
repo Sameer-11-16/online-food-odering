@@ -101,4 +101,61 @@ const authUser = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, authUser, sendOTP };
+// @desc    Forgot Password - Send OTP
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found with this email' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        await OTP.findOneAndUpdate(
+            { email },
+            { otp, createdAt: Date.now() },
+            { upsert: true, new: true }
+        );
+
+        await sendOTPEmail(email, otp, "Password Reset OTP", "Your OTP for password reset is:");
+
+        res.status(200).json({ message: 'Password reset OTP sent to email' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reset Password using OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    try {
+        const otpRecord = await OTP.findOne({ email });
+        if (!otpRecord || otpRecord.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        await OTP.deleteOne({ email });
+
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { registerUser, authUser, sendOTP, forgotPassword, resetPassword };
+
