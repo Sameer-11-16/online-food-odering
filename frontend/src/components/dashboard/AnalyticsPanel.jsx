@@ -1,4 +1,5 @@
 import { BarChart3, TrendingUp, DollarSign, ShoppingBag } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const AnalyticsPanel = ({ orders, menuItems }) => {
     const totalRevenue = orders.reduce((a, o) => a + o.totalPrice, 0);
@@ -53,12 +54,31 @@ const AnalyticsPanel = ({ orders, menuItems }) => {
                 {/* 7-Day Revenue Bar Chart */}
                 <div className="glass-panel" style={{ padding: '24px' }}>
                     <h4 style={{ fontWeight: 800, marginBottom: '20px' }}>Revenue — Last 7 Days</h4>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', height: '140px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px', height: '180px', padding: '10px 0' }}>
                         {dayRevenue.map((d, i) => (
-                            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
-                                <div style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', fontWeight: 700 }}>{d.value > 0 ? `₹${d.value.toFixed(0)}` : ''}</div>
-                                <div style={{ width: '100%', background: 'linear-gradient(to top,var(--primary),#ff6b81)', borderRadius: '6px 6px 0 0', height: `${(d.value / maxRev) * 100}%`, minHeight: d.value > 0 ? '4px' : '2px', transition: 'height 0.5s ease', opacity: d.value > 0 ? 1 : 0.2 }}></div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{d.label}</div>
+                            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', height: '100%', justifyContent: 'flex-end', position: 'relative' }}>
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: d.value > 0 ? 1 : 0.3 }}
+                                    style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 800, position: 'absolute', top: '-25px' }}
+                                >
+                                    {d.value > 0 ? `₹${d.value.toFixed(0)}` : ''}
+                                </motion.div>
+                                <motion.div 
+                                    initial={{ height: 0 }}
+                                    animate={{ height: `${(d.value / maxRev) * 100}%` }}
+                                    whileHover={{ scaleX: 1.1, filter: 'brightness(1.2)' }}
+                                    style={{ 
+                                        width: '100%', 
+                                        background: 'linear-gradient(to top, var(--primary), #ff6b81)', 
+                                        borderRadius: '8px 8px 0 0', 
+                                        minHeight: d.value > 0 ? '6px' : '2px', 
+                                        transition: 'height 1s cubic-bezier(0.17, 0.55, 0.55, 1), transform 0.2s ease', 
+                                        boxShadow: d.value > 0 ? '0 4px 12px rgba(255, 71, 87, 0.2)' : 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                ></motion.div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 700, marginTop: '5px' }}>{d.label}</div>
                             </div>
                         ))}
                     </div>

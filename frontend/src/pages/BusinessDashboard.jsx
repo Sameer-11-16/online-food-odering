@@ -75,7 +75,16 @@ const BusinessDashboard = () => {
                 setRestaurant(myRest);
                 
                 if (myRest) {
-                    if (activeTab === 'orders') {
+                    if (activeTab === 'overview' || activeTab === 'analytics') {
+                        const { data: orderData } = await axios.get(`/api/orders/restaurant/${myRest._id}`, config);
+                        const { data: menuData } = await axios.get(`/api/restaurants/${myRest._id}/menu`);
+                        setOrders(orderData);
+                        setMenuItems(menuData);
+                        if (activeTab === 'overview') {
+                            const { data: resData } = await axios.get(`/api/reservations/restaurant/${myRest._id}`, config);
+                            setReservations(resData);
+                        }
+                    } else if (activeTab === 'orders') {
                         const { data: orderData } = await axios.get(`/api/orders/restaurant/${myRest._id}`, config);
                         setOrders(orderData);
                     } else if (activeTab === 'reservations') {
