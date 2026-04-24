@@ -70,77 +70,87 @@ const OverviewPanel = ({ orders = [], menuItems = [] }) => {
 
     return (
         <div style={{ padding: '0 10px' }}>
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '24px', fontWeight: 800 }}>Business Command Insights</h2>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-                <StatsCard title="Gross Earnings" value={`₹${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={DollarSign} color="#2ed573" delay={0.1} />
-                <StatsCard title="Live Orders" value={orders.length} icon={ShoppingBag} color="#1e90ff" delay={0.2} />
-                <StatsCard title="Menu Items" value={menuItems.length} icon={TrendingUp} color="#ff4757" delay={0.3} />
-                <StatsCard title="Fulfillments" value={completedOrders} icon={Users} color="#ffa502" delay={0.4} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Business Command Insights</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(46, 213, 115, 0.1)', padding: '6px 12px', borderRadius: '20px', border: '1px solid #2ed57340' }}>
+                    <div className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2ed573' }}></div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#2ed573', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Connection Stable</span>
+                </div>
             </div>
+            
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ position: 'absolute', top: '10%', left: '50%', width: '300px', height: '300px', background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)', opacity: 0.05, filter: 'blur(50px)', pointerEvents: 'none', zIndex: -1 }}></div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px' }}>
+                    <StatsCard title="Gross Earnings" value={`₹${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} icon={DollarSign} color="#2ed573" delay={0.1} />
+                    <StatsCard title="Live Orders" value={orders.length} icon={ShoppingBag} color="#1e90ff" delay={0.2} />
+                    <StatsCard title="Menu Items" value={menuItems.length} icon={TrendingUp} color="#ff4757" delay={0.3} />
+                    <StatsCard title="Fulfillments" value={completedOrders} icon={Users} color="#ffa502" delay={0.4} />
+                </div>
 
-            <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-                <style>{`
-                    @media (min-width: 1200px) {
-                        .charts-grid {
-                            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+                <div className="charts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                    <style>{`
+                        @media (min-width: 1200px) {
+                            .charts-grid {
+                                grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+                            }
                         }
-                    }
-                `}</style>
-                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="glass-panel" style={{ padding: '30px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Sales vs Order Volume</h3>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)' }} /> Revenue</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1e90ff' }} /> Orders</span>
+                    `}</style>
+                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5 }} className="glass-panel" style={{ padding: '30px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Sales vs Order Volume</h3>
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)' }} /> Revenue</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1e90ff' }} /> Orders</span>
+                            </div>
                         </div>
-                    </div>
-                    <div style={{ height: '350px', width: '100%' }}>
-                        <ResponsiveContainer>
-                            <AreaChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient>
-                                    <linearGradient id="colorOrd" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#1e90ff" stopOpacity={0.4}/><stop offset="95%" stopColor="#1e90ff" stopOpacity={0}/></linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="#57606f" axisLine={false} tickLine={false} tick={{fontSize: 12}} dy={10} />
-                                <YAxis yId="left" stroke="#57606f" axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
-                                <YAxis yId="right" orientation="right" stroke="#57606f" axisLine={false} tickLine={false} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Area yId="left" type="monotone" name="Revenue" dataKey="revenue" stroke="var(--primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
-                                <Area yId="right" type="monotone" name="Orders" dataKey="orders" stroke="#1e90ff" strokeWidth={4} fillOpacity={1} fill="url(#colorOrd)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </motion.div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6 }} className="glass-panel" style={{ padding: '24px', flex: 1 }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '20px', fontWeight: 700 }}>Popular Categories</h3>
-                        <div style={{ height: '220px', width: '100%' }}>
+                        <div style={{ height: '350px', width: '100%' }}>
                             <ResponsiveContainer>
-                                <BarChart data={categoryStats}>
-                                    <XAxis dataKey="name" hide />
+                                <AreaChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient>
+                                        <linearGradient id="colorOrd" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#1e90ff" stopOpacity={0.4}/><stop offset="95%" stopColor="#1e90ff" stopOpacity={0}/></linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                    <XAxis dataKey="name" stroke="#57606f" axisLine={false} tickLine={false} tick={{fontSize: 12}} dy={10} />
+                                    <YAxis yId="left" stroke="#57606f" axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
+                                    <YAxis yId="right" orientation="right" stroke="#57606f" axisLine={false} tickLine={false} />
                                     <Tooltip content={<CustomTooltip />} />
-                                    <Bar dataKey="val" name="Orders" fill="#2ed573" radius={[8, 8, 8, 8]} barSize={20} />
-                                </BarChart>
+                                    <Area yId="left" type="monotone" name="Revenue" dataKey="revenue" stroke="var(--primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
+                                    <Area yId="right" type="monotone" name="Orders" dataKey="orders" stroke="#1e90ff" strokeWidth={4} fillOpacity={1} fill="url(#colorOrd)" />
+                                </AreaChart>
                             </ResponsiveContainer>
                         </div>
                     </motion.div>
 
-                    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }} className="glass-panel" style={{ padding: '24px', flex: 1 }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', fontWeight: 700 }}>Fulfillment Rate</h3>
-                        <div style={{ height: '180px', width: '100%' }}>
-                            <ResponsiveContainer>
-                                <PieChart>
-                                    <Pie data={statusData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                                        {statusData.map((entry, index) => <Cell key={index} fill={entry.color} stroke="none" />)}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </motion.div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.6 }} className="glass-panel" style={{ padding: '24px', flex: 1 }}>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '20px', fontWeight: 700 }}>Popular Categories</h3>
+                            <div style={{ height: '220px', width: '100%' }}>
+                                <ResponsiveContainer>
+                                    <BarChart data={categoryStats}>
+                                        <XAxis dataKey="name" hide />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Bar dataKey="val" name="Orders" fill="#2ed573" radius={[8, 8, 8, 8]} barSize={20} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </motion.div>
+
+                        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }} className="glass-panel" style={{ padding: '24px', flex: 1 }}>
+                            <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', fontWeight: 700 }}>Fulfillment Rate</h3>
+                            <div style={{ height: '180px', width: '100%' }}>
+                                <ResponsiveContainer>
+                                    <PieChart>
+                                        <Pie data={statusData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                                            {statusData.map((entry, index) => <Cell key={index} fill={entry.color} stroke="none" />)}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </div>
         </div>

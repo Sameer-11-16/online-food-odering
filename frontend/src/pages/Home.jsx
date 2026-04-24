@@ -54,7 +54,44 @@ const Home = () => {
                 transition={{ delay: 0.2, duration: 0.6 }}
                 className="hero-section"
                 style={{ textAlign: 'center', padding: '80px 0 60px', maxWidth: '900px', margin: '0 auto' }}>
-                <h1 style={{ fontWeight: 800, marginBottom: '24px' }}>
+                <div className="hero-background-elements" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1, overflow: 'hidden' }}>
+                    {[
+                        { emoji: '🍕', x: '10%', y: '20%', delay: 0 },
+                        { emoji: '🍔', x: '85%', y: '15%', delay: 2 },
+                        { emoji: '🍣', x: '5%', y: '70%', delay: 4 },
+                        { emoji: '🍜', x: '90%', y: '65%', delay: 1 },
+                        { emoji: '🥑', x: '15%', y: '45%', delay: 3 },
+                        { emoji: '🍦', x: '80%', y: '50%', delay: 5 },
+                    ].map((item, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ 
+                                opacity: [0, 0.15, 0],
+                                scale: [0.8, 1.2, 0.8],
+                                y: [0, -100, 0],
+                                rotate: [0, 20, -20, 0]
+                            }}
+                            transition={{
+                                duration: 10 + Math.random() * 5,
+                                repeat: Infinity,
+                                delay: item.delay,
+                                ease: "easeInOut"
+                            }}
+                            style={{
+                                position: 'absolute',
+                                left: item.x,
+                                top: item.y,
+                                fontSize: '2.5rem',
+                                filter: 'blur(1px)'
+                            }}
+                        >
+                            {item.emoji}
+                        </motion.div>
+                    ))}
+                </div>
+
+                <h1 style={{ fontWeight: 800, marginBottom: '24px', position: 'relative' }}>
                     Premium food delivery <br className="hide-mobile" />
                     to your <span className="gradient-text">doorstep</span>
                 </h1>
