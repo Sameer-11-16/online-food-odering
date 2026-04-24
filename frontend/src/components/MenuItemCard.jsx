@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -195,40 +196,11 @@ const MenuItemCard = ({ item: initialItem, disabled }) => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px', overflow: 'hidden' }}
                     >
-                        {/* Review Form */}
-                        {userInfo ? (
-                            <form onSubmit={submitReviewHandler} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                                <select 
-                                    value={rating} 
-                                    onChange={e => setRating(e.target.value)}
-                                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', padding: '0 5px' }}
-                                >
-                                    <option value="5">5★</option>
-                                    <option value="4">4★</option>
-                                    <option value="3">3★</option>
-                                    <option value="2">2★</option>
-                                    <option value="1">1★</option>
-                                </select>
-                                <input 
-                                    type="text" 
-                                    placeholder="Write a food review..." 
-                                    value={comment} 
-                                    onChange={e => setComment(e.target.value)}
-                                    required
-                                    style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', padding: '8px 12px', fontSize: '0.9rem' }}
-                                />
-                                <button 
-                                    disabled={submitting}
-                                    type="submit" 
-                                    style={{ background: 'var(--primary)', border: 'none', color: 'white', borderRadius: '8px', padding: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Send size={16} />
-                                </button>
-                            </form>
-                        ) : (
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '10px' }}>Login to review this item</p>
-                        )}
+                        {/* No inline review form anymore - Centralized in My Activity */}
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', textAlign: 'center', marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                            Rate this item from your <Link to="/customer-dashboard" style={{ color: 'var(--primary)', fontWeight: 700 }}>Activity Dashboard</Link> after delivery.
+                        </p>
 
                         {/* Reviews List */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '150px', overflowY: 'auto', paddingRight: '5px' }}>

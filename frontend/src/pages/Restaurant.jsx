@@ -259,37 +259,21 @@ const Restaurant = () => {
                             transition={{ duration: 0.3 }}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', alignItems: 'start' }}>
-                                {/* Review Form */}
-                                <div className="glass-panel" style={{ padding: '30px' }}>
-                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '20px' }}>Write a Review</h3>
-                                    {reviewStatus && (
-                                        <div style={{ padding: '10px', borderRadius: '8px', marginBottom: '15px', textAlign: 'center', fontSize: '0.9rem', background: reviewStatus.type === 'success' ? 'rgba(46, 213, 115, 0.1)' : 'rgba(255, 71, 87, 0.1)', color: reviewStatus.type === 'success' ? 'var(--secondary)' : 'var(--primary)' }}>
-                                            {reviewStatus.message}
-                                        </div>
-                                    )}
-                                    {userInfo ? (
-                                        <form onSubmit={submitReviewHandler}>
-                                            <div className="input-group">
-                                                <label className="input-label">Rating</label>
-                                                <select className="input-glass" value={rating} onChange={(e) => setRating(e.target.value)}>
-                                                    <option value="5">5 - Excellent</option>
-                                                    <option value="4">4 - Very Good</option>
-                                                    <option value="3">3 - Good</option>
-                                                    <option value="2">2 - Fair</option>
-                                                    <option value="1">1 - Poor</option>
-                                                </select>
-                                            </div>
-                                            <div className="input-group">
-                                                <label className="input-label">Comment</label>
-                                                <textarea className="input-glass" rows="4" value={comment} onChange={(e) => setComment(e.target.value)} required placeholder="Share your experience..."></textarea>
-                                            </div>
-                                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Submit Review</button>
-                                        </form>
-                                    ) : (
-                                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                            Please <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>login</Link> to write a review.
+                                {/* Information about Reviews */}
+                                <div className="glass-panel" style={{ padding: '30px', textAlign: 'center' }}>
+                                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '16px' }}>Share Your Experience</h3>
+                                    <div style={{ fontSize: '3rem', marginBottom: '20px' }}>⭐</div>
+                                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '20px' }}>
+                                        To ensure all reviews are 100% authentic, we only accept ratings from customers who have placed an order.
+                                    </p>
+                                    <div style={{ background: 'rgba(255, 165, 2, 0.1)', padding: '15px', borderRadius: '12px', border: '1px dashed #ffa502' }}>
+                                        <p style={{ fontWeight: 800, color: '#ffa502', fontSize: '0.9rem' }}>
+                                            Ordered recently? 
                                         </p>
-                                    )}
+                                        <Link to="/customer-dashboard" style={{ display: 'block', marginTop: '10px', color: 'var(--primary)', fontWeight: 800, textDecoration: 'underline' }}>
+                                            Go to My Activity to Rate
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 {/* Review List */}
