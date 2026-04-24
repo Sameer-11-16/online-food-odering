@@ -35,8 +35,14 @@ const CustomerDashboard = () => {
     const { userInfo } = useAuth();
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
-    const [reservations, setReservations] = useState([]);
     const [activity, setActivity] = useState(null);
+    const [reviewForm, setReviewForm] = useState({ show: false, targetId: null, type: 'restaurant', rating: 5, comment: '' });
+
+    const fetchActivity = async () => {
+        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+        const { data } = await axios.get('/api/users/activity', config);
+        setActivity(data);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,12 +54,27 @@ const CustomerDashboard = () => {
                 const { data } = await axios.get('/api/reservations/myreservations', config);
                 setReservations(data);
             } else if (activeTab === 'activity') {
-                const { data } = await axios.get('/api/users/activity', config);
-                setActivity(data);
+                fetchActivity();
             }
         };
         fetchData();
     }, [activeTab, userInfo]);
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            await axios.post(`/api/restaurants/${reviewForm.targetId}/reviews`, {
+                rating: reviewForm.rating,
+                comment: reviewForm.comment
+            }, config);
+            toast.success('Review shared! Thank you.');
+            setReviewForm({ show: false, targetId: null, type: 'restaurant', rating: 5, comment: '' });
+            fetchActivity();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to submit review');
+        }
+    };
 
     useEffect(() => {
         if (userInfo) {
@@ -146,40 +167,115 @@ const CustomerDashboard = () => {
                         </div>
                     ))
                 ) : activeTab === 'activity' ? (
-                    activity?.reviews.length === 0 ? (
-                        <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>No activity yet. Start ordering and sharing your experiences!</p>
-                    ) : (
-                        activity?.reviews.map((rev, i) => (
-                            <motion.div 
-                                key={i} 
-                                initial={{ opacity: 0, scale: 0.95 }} 
-                                animate={{ opacity: 1, scale: 1 }} 
-                                transition={{ delay: i * 0.05 }}
-                                className="glass-panel" 
-                                style={{ padding: '20px', borderLeft: `4px solid ${rev.type === 'Restaurant' ? 'var(--primary)' : '#2ed573'}` }}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                    <div>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{rev.type} Review</span>
-                                        <h4 style={{ fontWeight: 800, fontSize: '1.05rem', marginTop: '2px' }}>{rev.targetName}</h4>
-                                    </div>
-                                    <div style={{ background: 'rgba(255, 165, 2, 0.15)', color: '#ffa502', padding: '4px 8px', borderRadius: '8px', fontWeight: 800, fontSize: '0.85rem' }}>
-                                        ⭐ {rev.rating}
-                                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        {activity?.pendingReviews.length > 0 && (
+                            <div style={{ marginBottom: '40px' }}>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    ✨ Pending Reviews <span style={{ background: 'var(--primary)', color: 'white', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px' }}>{activity.pendingReviews.length}</span>
+                                </h3>
+                                <div style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '16px', scrollbarWidth: 'none' }}>
+                                    {activity.pendingReviews.map(order => (
+                                        <div key={order._id} className="glass-panel" style={{ minWidth: '280px', padding: '20px', flexShrink: 0 }}>
+                                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                                                <div style={{ width: '50px', height: '50px', borderRadius: '10px', background: `url(${order.image ? (order.image.startsWith('http') ? order.image : API_BASE_URL + order.image) : ''}) center/cover`, backgroundColor: 'var(--glass-bg)' }} />
+                                                <div>
+                                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 800 }}>{order.targetName}</h4>
+                                                    <p style={{ fontSize: '0.75rem', opacity: 0.6 }}>Ordered on {new Date(order.date).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => setReviewForm({ ...reviewForm, show: true, targetId: order.targetId })}
+                                                className="btn btn-primary" 
+                                                style={{ width: '100%', padding: '8px', fontSize: '0.85rem' }}
+                                            >
+                                                Review Now
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '12px' }}>"{rev.comment}"</p>
-                                <div style={{ fontSize: '0.75rem', opacity: 0.5, textAlign: 'right' }}>
-                                    {new Date(rev.createdAt).toLocaleDateString()}
-                                </div>
-                            </motion.div>
-                        ))
-                    )
+                            </div>
+                        )}
+
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '20px' }}>Your Review History</h3>
+                        <div className="card-grid">
+                            {activity?.reviews.length === 0 ? (
+                                <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>No reviews shared yet.</p>
+                            ) : (
+                                activity?.reviews.map((rev, i) => (
+                                    <motion.div 
+                                        key={i} 
+                                        initial={{ opacity: 0, scale: 0.95 }} 
+                                        animate={{ opacity: 1, scale: 1 }} 
+                                        transition={{ delay: i * 0.05 }}
+                                        className="glass-panel" 
+                                        style={{ padding: '20px', borderLeft: `4px solid ${rev.type === 'Restaurant' ? 'var(--primary)' : '#2ed573'}` }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                            <div>
+                                                <span style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{rev.type} Review</span>
+                                                <h4 style={{ fontWeight: 800, fontSize: '1.05rem', marginTop: '2px' }}>{rev.targetName}</h4>
+                                            </div>
+                                            <div style={{ background: 'rgba(255, 165, 2, 0.15)', color: '#ffa502', padding: '4px 8px', borderRadius: '8px', fontWeight: 800, fontSize: '0.85rem' }}>
+                                                ⭐ {rev.rating}
+                                            </div>
+                                        </div>
+                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '12px' }}>"{rev.comment}"</p>
+                                        <div style={{ fontSize: '0.75rem', opacity: 0.5, textAlign: 'right' }}>
+                                            {new Date(rev.createdAt).toLocaleDateString()}
+                                        </div>
+                                    </motion.div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 ) : (
                     <div style={{ gridColumn: '1 / -1' }}>
                         <ReceiptsPanel orders={orders} />
                     </div>
                 )}
             </div>
+
+            {/* Quick Review Modal */}
+            <AnimatePresence>
+                {reviewForm.show && (
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }} 
+                            animate={{ scale: 1, opacity: 1 }} 
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="glass-panel" 
+                            style={{ padding: '30px', maxWidth: '400px', width: '100%' }}
+                        >
+                            <h3 style={{ marginBottom: '20px', fontWeight: 800 }}>Quick Review</h3>
+                            <form onSubmit={handleReviewSubmit}>
+                                <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                                    {[1, 2, 3, 4, 5].map(star => (
+                                        <span 
+                                            key={star} 
+                                            onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                            style={{ fontSize: '1.5rem', cursor: 'pointer', color: star <= reviewForm.rating ? '#ffa502' : 'rgba(255,255,255,0.1)' }}
+                                        >
+                                            ⭐
+                                        </span>
+                                    ))}
+                                </div>
+                                <textarea 
+                                    className="input-glass" 
+                                    style={{ width: '100%', minHeight: '100px', marginBottom: '20px' }} 
+                                    placeholder="Share your experience..."
+                                    value={reviewForm.comment}
+                                    onChange={e => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                                    required
+                                />
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Post Review</button>
+                                    <button type="button" onClick={() => setReviewForm({ ...reviewForm, show: false })} className="btn btn-secondary">Cancel</button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

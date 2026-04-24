@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurant');
 const MenuItem = require('../models/MenuItem');
+const Order = require('../models/Order');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -52,7 +53,22 @@ const getUserActivity = async (req, res) => {
     try {
         const userId = req.user._id;
         
-        // Find restaurant reviews
+        // Find delivered orders to identify pending reviews
+        const deliveredOrders = await Order.find({ user: userId, status: 'Delivered' }).populate('restaurant', 'name imageUrl reviews');
+        
+        const pendingReviews = deliveredOrders.filter(order => {
+            if (!order.restaurant) return false;
+            const hasReviewed = order.restaurant.reviews.some(rev => rev.user.toString() === userId.toString());
+            return !hasReviewed;
+        }).map(order => ({
+            _id: order._id,
+            targetId: order.restaurant._id,
+            targetName: order.restaurant.name,
+            image: order.restaurant.imageUrl,
+            date: order.deliveredAt
+        }));
+
+        // Find restaurant reviews (already done)
         const restaurants = await Restaurant.find({ "reviews.user": userId });
         const restaurantReviews = restaurants.flatMap(r => 
             r.reviews
@@ -66,7 +82,7 @@ const getUserActivity = async (req, res) => {
                 }))
         );
 
-        // Find menu item reviews
+        // Find menu item reviews (already done)
         const menuItems = await MenuItem.find({ "reviews.user": userId });
         const itemReviews = menuItems.flatMap(m => 
             m.reviews
@@ -83,6 +99,7 @@ const getUserActivity = async (req, res) => {
         const allReviews = [...restaurantReviews, ...itemReviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         res.json({
+            pendingReviews,
             reviews: allReviews,
             count: allReviews.length
         });
