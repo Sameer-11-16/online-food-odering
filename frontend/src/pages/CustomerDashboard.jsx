@@ -83,9 +83,9 @@ const CustomerDashboard = () => {
 
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
                 <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>My Food Journey</h2>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                     <button onClick={() => setActiveTab('orders')} className={`btn ${activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'}`}>My Orders</button>
                     <button onClick={() => setActiveTab('bookings')} className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}>Table Bookings</button>
                 </div>

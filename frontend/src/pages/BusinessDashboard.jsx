@@ -312,6 +312,22 @@ const BusinessDashboard = () => {
                                 height: calc(100vh - 140px);
                             }
                         }
+                        @media (max-width: 991px) {
+                            .sidebar-sticky {
+                                flex-direction: row !important;
+                                overflow-x: auto;
+                                padding: 10px 15px !important;
+                                white-space: nowrap;
+                            }
+                            .sidebar-sticky > div:first-child,
+                            .sidebar-sticky > div.section-title {
+                                display: none !important;
+                            }
+                            .sidebar-sticky button {
+                                width: auto !important;
+                                flex: 0 0 auto;
+                            }
+                        }
                     `}</style>
                     
                     {/* 15-Point Sidebar Navigation (Responsive) */}
@@ -339,21 +355,21 @@ const BusinessDashboard = () => {
                             );
                             return (
                                 <>
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '10px', marginBottom: '6px', paddingLeft: '8px' }}>Operations</div>
+                                    <div className="section-title" style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '10px', marginBottom: '6px', paddingLeft: '8px' }}>Operations</div>
                                     <TabBtn id="overview" icon={Activity} label="1. Dashboard" />
                                     <TabBtn id="menu" icon={Utensils} label="2. Menu Management" />
                                     <TabBtn id="orders" icon={Package} label="3. Order Management" />
                                     <TabBtn id="kitchen" icon={ChefHat} label="4. Kitchen Panel" />
                                     <TabBtn id="billing" icon={CreditCard} label="5. Payment & Billing" />
                                     
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '6px', paddingLeft: '8px' }}>Management</div>
+                                    <div className="section-title" style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '6px', paddingLeft: '8px' }}>Management</div>
                                     <TabBtn id="inventory" icon={Box} label="6. Inventory" />
                                     <TabBtn id="customers" icon={Users} label="7. Customers" />
                                     <TabBtn id="analytics" icon={BarChart3} label="8. Reports & Analytics" />
                                     <TabBtn id="offers" icon={Tag} label="9. Offers & Discounts" />
                                     <TabBtn id="notifications" icon={Bell} label="10. Notifications" />
 
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '6px', paddingLeft: '8px' }}>Administration</div>
+                                    <div className="section-title" style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '6px', paddingLeft: '8px' }}>Administration</div>
                                     <TabBtn id="settings" icon={Settings} label="11. Settings" />
                                     <TabBtn id="delivery" icon={Truck} label="12. Delivery" />
                                     <TabBtn id="staff" icon={UserCircle} label="13. Staff" />
