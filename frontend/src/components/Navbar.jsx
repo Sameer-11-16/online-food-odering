@@ -53,22 +53,23 @@ const Navbar = () => {
     <nav className="glass-nav">
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '80px' }}>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ background: 'var(--primary)', padding: '10px', borderRadius: '12px' }}>
-              <Utensils size={24} color="white" />
-            </div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }} className="hide-mobile">
-              Bite<span className="gradient-text">Stream</span>
-            </h1>
-          </Link>
-
-          {userInfo?.role !== 'restaurant_owner' && (
-              <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--glass-accent)', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--glass-border)', fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '200px' }}>
-                  <MapPin size={14} color="var(--primary)" style={{ flexShrink: 0 }} />
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{address}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--primary)', padding: '10px', borderRadius: '12px' }}>
+                <Utensils size={24} color="white" />
               </div>
-          )}
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }} className="hide-mobile">
+                Bite<span className="gradient-text">Stream</span>
+              </h1>
+            </Link>
 
+            {userInfo?.role !== 'restaurant_owner' && (
+                <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--glass-accent)', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--glass-border)', fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '200px' }}>
+                    <MapPin size={14} color="var(--primary)" style={{ flexShrink: 0 }} />
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{address}</span>
+                </div>
+            )}
+          </div>
 
           {userInfo?.role !== 'restaurant_owner' && (
               <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', background: 'var(--glass-accent)', padding: '6px 16px', borderRadius: '24px', border: '1px solid var(--glass-border)' }} className="hide-mobile">
