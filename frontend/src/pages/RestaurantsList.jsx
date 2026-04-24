@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { CardSkeleton } from '../components/Skeleton';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -50,7 +50,10 @@ const RestaurantsList = () => {
             </div>
             
             <div className="card-grid">
-                {restaurants.length === 0 ? <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No restaurants found.</p> : restaurants.map((restaurant, index) => {
+                {restaurants.length === 0 ? (
+                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No restaurants found.</p>
+                ) : (
+                    restaurants.map((restaurant, index) => {
                     const dist = getDistance(restaurant);
                     const tooFar = dist !== null && dist > MAX_DELIVERY_KM;
                     return (

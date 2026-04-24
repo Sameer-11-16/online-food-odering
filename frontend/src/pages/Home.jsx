@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { CardSkeleton } from '../components/Skeleton';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -39,10 +39,12 @@ const Home = () => {
         fetchRestaurants();
     }, []);
 
-    const filteredRestaurants = restaurants.filter(r => 
-        r.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (r.description && r.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredRestaurants = useMemo(() => {
+        return restaurants.filter(r => 
+            r.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            (r.description && r.description.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+    }, [restaurants, searchQuery]);
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
