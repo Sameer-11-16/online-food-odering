@@ -119,13 +119,13 @@ const Checkout = () => {
 
 
 
-            await axios.post('/api/orders', reqBody, config);
+            const { data: orderResponse } = await axios.post('/api/orders', reqBody, config);
             
             toast.success('Order Placed Successfully!', { icon: '🎉' });
             new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3').play().catch(() => {});
 
             cartItems.forEach(item => removeFromCart(item._id));
-            navigate('/payment-success');
+            navigate('/payment-success', { state: { order: orderResponse } });
             
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to place order');

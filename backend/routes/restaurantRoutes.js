@@ -11,11 +11,13 @@ const {
     updateMenuItem,
     createRestaurantReview,
     createMenuItemReview,
+    searchFood
 } = require('../controllers/restaurantController');
 
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/').get(getRestaurants).post(protect, createRestaurant);
+router.route('/search/food').get(searchFood);
 router.route('/:id/reviews').post(protect, createRestaurantReview);
 router.route('/:id').get(getRestaurantById).put(protect, updateRestaurant);
 

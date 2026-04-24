@@ -13,6 +13,30 @@ const getRestaurants = async (req, res) => {
     }
 };
 
+// @desc    Search food items globally
+// @route   GET /api/restaurants/search/food?q=...
+// @access  Public
+const searchFood = async (req, res) => {
+    try {
+        const keyword = req.query.q ? {
+            name: {
+                $regex: req.query.q,
+                $options: 'i',
+            },
+        } : {};
+
+        const items = await MenuItem.find({ ...keyword }).populate('restaurant', 'name imageUrl rating address location');
+        
+        if (items.length === 0) {
+            return res.status(404).json({ message: 'Food item not found' });
+        }
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 // @desc    Fetch single restaurant
 // @route   GET /api/restaurants/:id
 // @access  Public
@@ -267,6 +291,5 @@ module.exports = {
     updateMenuItem,
     createRestaurantReview,
     createMenuItemReview,
+    searchFood
 };
-
-

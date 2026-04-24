@@ -64,20 +64,22 @@ const Home = () => {
                     >
                         Order Now
                     </motion.button>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                        className="btn btn-secondary"
-                        style={{ padding: '14px 32px', fontSize: '1.1rem' }}
-                        onClick={() => document.getElementById('restaurant-list')?.scrollIntoView({ behavior: 'smooth' })}
-                    >
-                        View Restaurants
-                    </motion.button>
+                    <Link to="/restaurants">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                            className="btn btn-secondary"
+                            style={{ padding: '14px 32px', fontSize: '1.1rem' }}
+                        >
+                            View All Restaurants
+                        </motion.button>
+                    </Link>
                 </div>
             </motion.section>
 
             <section id="restaurant-list" style={{ marginTop: '40px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                     <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>Featured Restaurants</h2>
+                    <Link to="/restaurants" style={{ color: 'var(--primary)', fontWeight: 600 }}>See All</Link>
                 </div>
                 
                 <motion.div 
@@ -85,7 +87,7 @@ const Home = () => {
                     animate={{ opacity: 1 }} 
                     transition={{ delay: 0.4 }}
                     className="card-grid">
-                    {filteredRestaurants.length === 0 ? <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No restaurants found for "{searchQuery}"</p> : filteredRestaurants.map((restaurant, index) => {
+                    {filteredRestaurants.slice(0, 4).map((restaurant, index) => {
                         const dist = getDistance(restaurant);
                         const tooFar = dist !== null && dist > MAX_DELIVERY_KM;
                         return (

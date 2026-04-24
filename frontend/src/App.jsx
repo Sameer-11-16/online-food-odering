@@ -14,6 +14,9 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import AdminDashboard from './pages/AdminDashboard';
 import PaymentSuccess from './pages/PaymentSuccess';
+import RestaurantsList from './pages/RestaurantsList';
+import SearchPage from './pages/SearchPage';
+import OrderTracker from './components/OrderTracker';
 
 
 // Persona-based separations
@@ -69,6 +72,8 @@ const AppContent = () => {
       <main className={isWideLayout ? "container-wide" : "container"}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/restaurants" element={<RestaurantsList />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/restaurant/:id" element={<Restaurant />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -89,7 +94,7 @@ const AppContent = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
         </Routes>
-
+        <OrderTracker />
       </main>
     </>
   );

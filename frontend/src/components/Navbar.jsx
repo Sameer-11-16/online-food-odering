@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if(searchKw.trim()) navigate(`/?search=${searchKw}`);
+    if(searchKw.trim()) navigate(`/search?q=${searchKw}`);
     else navigate('/');
   }
 
