@@ -35,11 +35,24 @@ const addOrderItems = async (req, res) => {
             // Fetch restaurant and user details for receipt
             const populatedOrder = await Order.findById(createdOrder._id)
                 .populate('user', 'email name')
-                .populate('restaurant', 'name');
+                .populate({
+                    path: 'restaurant',
+                    select: 'name owner',
+                    populate: { path: 'owner', select: 'email' }
+                });
 
-            if (populatedOrder && populatedOrder.user?.email) {
-                // Send to user
-                sendReceiptEmail(populatedOrder.user.email, populatedOrder, populatedOrder.restaurant.name).catch(console.error);
+            if (populatedOrder) {
+                // Send to customer
+                if (populatedOrder.user?.email) {
+                    sendReceiptEmail(populatedOrder.user.email, populatedOrder, populatedOrder.restaurant.name)
+                        .catch(err => console.error('Error sending receipt to customer:', err));
+                }
+
+                // Send to restaurant owner (Admin)
+                if (populatedOrder.restaurant?.owner?.email) {
+                    sendReceiptEmail(populatedOrder.restaurant.owner.email, populatedOrder, populatedOrder.restaurant.name)
+                        .catch(err => console.error('Error sending receipt to restaurant owner:', err));
+                }
             }
 
             // Notify the restaurant about the new order

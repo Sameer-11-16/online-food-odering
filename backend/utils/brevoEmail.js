@@ -123,9 +123,18 @@ const sendReceiptEmail = async (email, order, restaurantName) => {
             },
             body: JSON.stringify(emailData)
         });
-        return await response.json();
+        
+        const data = await response.json();
+        if (!response.ok) {
+            console.error('Brevo Receipt API Error:', data);
+            return { error: true, data };
+        }
+        
+        console.log('Receipt sent successfully to:', email);
+        return data;
     } catch (error) {
         console.error('Brevo Receipt Error:', error);
+        return { error: true, message: error.message };
     }
 };
 
