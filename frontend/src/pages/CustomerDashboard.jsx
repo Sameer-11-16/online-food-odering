@@ -132,7 +132,7 @@ const CustomerDashboard = () => {
                             </div>
                         </div>
                     ))
-                ) : (
+                ) : activeTab === 'bookings' ? (
                     reservations.map(res => (
                         <div key={res._id} className="glass-panel" style={{ padding: '24px' }}>
                              <h4 style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '8px' }}>{res.restaurant?.name}</h4>
