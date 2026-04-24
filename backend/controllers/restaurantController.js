@@ -1,5 +1,6 @@
 const Restaurant = require('../models/Restaurant');
 const MenuItem = require('../models/MenuItem');
+const Order = require('../models/Order');
 
 // @desc    Fetch all restaurants
 // @route   GET /api/restaurants
@@ -178,6 +179,16 @@ const createRestaurantReview = async (req, res) => {
         const restaurant = await Restaurant.findById(req.params.id);
 
         if (restaurant) {
+            // Check if user has ordered from this restaurant
+            const hasOrdered = await Order.findOne({
+                user: req.user._id,
+                restaurant: req.params.id,
+                status: 'Delivered'
+            });
+
+            if (!hasOrdered) {
+                return res.status(403).json({ message: 'You can only review restaurants you have ordered from and received delivery.' });
+            }
             const alreadyReviewed = restaurant.reviews.find(
                 (r) => r.user.toString() === req.user._id.toString()
             );
@@ -221,6 +232,16 @@ const createMenuItemReview = async (req, res) => {
         const menuItem = await MenuItem.findById(req.params.menuId);
 
         if (menuItem) {
+            // Check if user has ordered this specific item
+            const hasPurchased = await Order.findOne({
+                user: req.user._id,
+                'orderItems.menuItem': req.params.menuId,
+                status: 'Delivered'
+            });
+
+            if (!hasPurchased) {
+                return res.status(403).json({ message: 'You can only review items you have purchased and received.' });
+            }
             const alreadyReviewed = menuItem.reviews.find(
                 (r) => r.user.toString() === req.user._id.toString()
             );
