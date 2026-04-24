@@ -1,4 +1,6 @@
 const Order = require('../models/Order');
+const Restaurant = require('../models/Restaurant');
+const { sendReceiptEmail } = require('../utils/brevoEmail');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -30,6 +32,16 @@ const addOrderItems = async (req, res) => {
 
             const createdOrder = await order.save();
             
+            // Fetch restaurant and user details for receipt
+            const populatedOrder = await Order.findById(createdOrder._id)
+                .populate('user', 'email name')
+                .populate('restaurant', 'name');
+
+            if (populatedOrder && populatedOrder.user?.email) {
+                // Send to user
+                sendReceiptEmail(populatedOrder.user.email, populatedOrder, populatedOrder.restaurant.name).catch(console.error);
+            }
+
             // Notify the restaurant about the new order
             const io = req.app.get('socketio');
             if (io && restaurant) {

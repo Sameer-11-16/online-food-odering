@@ -6,6 +6,7 @@ import axios from 'axios';
 import { socket } from '../socket';
 import { toast } from 'react-hot-toast';
 import API_BASE_URL from '../apiConfig';
+import ReceiptsPanel from '../components/dashboard/ReceiptsPanel';
 
 const OrderTracker = ({ status }) => {
 
@@ -39,7 +40,7 @@ const CustomerDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-            if (activeTab === 'orders') {
+            if (activeTab === 'orders' || activeTab === 'receipts') {
                 const { data } = await axios.get('/api/orders/myorders', config);
                 setOrders(data);
             } else if (activeTab === 'bookings') {
@@ -88,6 +89,7 @@ const CustomerDashboard = () => {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                     <button onClick={() => setActiveTab('orders')} className={`btn ${activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'}`}>My Orders</button>
                     <button onClick={() => setActiveTab('bookings')} className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}>Table Bookings</button>
+                    <button onClick={() => setActiveTab('receipts')} className={`btn ${activeTab === 'receipts' ? 'btn-primary' : 'btn-secondary'}`}>Receipts</button>
                 </div>
             </div>
 
@@ -138,6 +140,10 @@ const CustomerDashboard = () => {
                              <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>{res.guests} Guests • {res.status}</p>
                         </div>
                     ))
+                ) : (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        <ReceiptsPanel orders={orders} />
+                    </div>
                 )}
             </div>
         </div>

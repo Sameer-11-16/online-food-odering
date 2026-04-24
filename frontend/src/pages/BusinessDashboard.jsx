@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { socket } from '../socket';
-import { Utensils, Package, Calendar, Settings, Activity, ChefHat, CreditCard, Box, Users, BarChart3, Tag, Bell, Truck, UserCircle, Star, Shield, LogOut } from 'lucide-react';
+import { Utensils, Package, Calendar, Settings, Activity, ChefHat, CreditCard, Box, Users, BarChart3, Tag, Bell, Truck, UserCircle, Star, Shield, LogOut, FileText } from 'lucide-react';
 import OverviewPanel from '../components/dashboard/OverviewPanel';
 import KitchenPanel from '../components/dashboard/KitchenPanel';
 import SettingsPanel from '../components/dashboard/SettingsPanel';
@@ -18,6 +18,7 @@ import DeliveryPanel from '../components/dashboard/DeliveryPanel';
 import StaffPanel from '../components/dashboard/StaffPanel';
 import ReviewsPanel from '../components/dashboard/ReviewsPanel';
 import SecurityPanel from '../components/dashboard/SecurityPanel';
+import ReceiptsPanel from '../components/dashboard/ReceiptsPanel';
 import API_BASE_URL from '../apiConfig';
 
 const BusinessDashboard = () => {
@@ -82,6 +83,9 @@ const BusinessDashboard = () => {
                     } else if (activeTab === 'menu') {
                         const { data: menuData } = await axios.get(`/api/restaurants/${myRest._id}/menu`);
                         setMenuItems(menuData);
+                    } else if (activeTab === 'receipts') {
+                        const { data: orderData } = await axios.get(`/api/orders/restaurant/${myRest._id}`, config);
+                        setOrders(orderData);
                     }
                 }
                 
@@ -374,7 +378,8 @@ const BusinessDashboard = () => {
                                     <TabBtn id="delivery" icon={Truck} label="12. Delivery" />
                                     <TabBtn id="staff" icon={UserCircle} label="13. Staff" />
                                     <TabBtn id="reviews" icon={Star} label="14. Reviews" />
-                                    <TabBtn id="security" icon={Shield} label="15. Security" />
+                                    <TabBtn id="receipts" icon={FileText} label="15. Receipts" />
+                                    <TabBtn id="security" icon={Shield} label="16. Security" />
                                 </>
                             );
                         })()}
@@ -728,6 +733,12 @@ const BusinessDashboard = () => {
                              {activeTab === 'reviews' && (
                                  <motion.div key="reviews" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
                                      <ReviewsPanel restaurant={restaurant} />
+                                 </motion.div>
+                             )}
+
+                             {activeTab === 'receipts' && (
+                                 <motion.div key="receipts" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
+                                     <ReceiptsPanel orders={orders} />
                                  </motion.div>
                              )}
 
