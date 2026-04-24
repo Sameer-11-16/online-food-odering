@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut, Home } from 'lucide-react';
+import { Utensils, ShoppingBag, User, Sun, Moon, Search, LogOut, Home, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import useGeoLocation from '../hooks/useGeoLocation';
 
 const Navbar = () => {
   const [searchKw, setSearchKw] = useState('');
@@ -12,6 +13,29 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const navigate = useNavigate();
+  const location = useGeoLocation();
+  const [address, setAddress] = useState('Locating...');
+
+  useEffect(() => {
+    if (location.lat && location.lng) {
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.address) {
+                // Try to get a meaningful short address
+                const shortAddr = data.address.suburb || data.address.neighbourhood || data.address.city_district || data.address.city || data.address.town;
+                const city = data.address.city || data.address.state_district || data.address.state;
+                setAddress(`${shortAddr ? shortAddr + ', ' : ''}${city}`);
+            } else {
+                setAddress('Location Found');
+            }
+        })
+        .catch(() => setAddress('Location Found'));
+    } else if (location.error) {
+        setAddress('Location Disabled');
+    }
+  }, [location.lat, location.lng, location.error]);
+
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -37,6 +61,14 @@ const Navbar = () => {
               Bite<span className="gradient-text">Stream</span>
             </h1>
           </Link>
+
+          {userInfo?.role !== 'restaurant_owner' && (
+              <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--glass-accent)', padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--glass-border)', fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '200px' }}>
+                  <MapPin size={14} color="var(--primary)" style={{ flexShrink: 0 }} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{address}</span>
+              </div>
+          )}
+
 
           {userInfo?.role !== 'restaurant_owner' && (
               <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', background: 'var(--glass-accent)', padding: '6px 16px', borderRadius: '24px', border: '1px solid var(--glass-border)' }} className="hide-mobile">
