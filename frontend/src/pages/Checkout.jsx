@@ -255,12 +255,16 @@ const Checkout = () => {
                                     >
                                         ID: {restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID} 📋
                                     </span>
-                                </p>
-
-
-
-
-                                
+                                </p>                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                                    <a 
+                                        href={`upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Food Order')}&tr=${Date.now()}`}
+                                        className="btn btn-primary"
+                                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#1e90ff' }}
+                                    >
+                                        🚀 Open UPI App
+                                    </a>
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Clicking above will open your installed UPI apps (GPay, PhonePe, etc.)</p>
+                                </div>
                                 <div className="input-group" style={{ textAlign: 'left' }}>
                                     <label className="input-label">Enter 12-Digit UTR / Ref Number</label>
                                     <input type="text" className="input-glass" placeholder="Example: 3042XXXXXXXX" value={utrNumber} onChange={e => setUtrNumber(e.target.value)} maxLength={12} />
