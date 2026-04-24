@@ -141,12 +141,16 @@ const Checkout = () => {
 
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            
+            // 0. Fetch Razorpay Key
+            const { data: sdkKey } = await axios.get('/api/razorpay/config');
+            
             // 1. Create order on backend
             const { data: order } = await axios.post('/api/razorpay/order', { amount: total }, config);
 
             // 2. Open Razorpay Modal
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummy',
+                key: sdkKey,
                 amount: order.amount,
                 currency: order.currency,
                 name: "BiteStream Food",
