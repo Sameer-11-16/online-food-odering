@@ -242,7 +242,7 @@ const Checkout = () => {
                                 <div style={{ background: 'white', padding: '15px', borderRadius: '15px', display: 'inline-block', marginBottom: '20px' }}>
                                     <img 
                                         src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
-                                            `upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Food Order')}&tr=${Date.now()}`
+                                            `upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('BiteStream Order')}`
                                         )}`} 
                                         alt="UPI QR" 
                                         style={{ width: '220px', height: '220px' }} 
@@ -261,13 +261,13 @@ const Checkout = () => {
                                     </span>
                                 </p>                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
                                     <a 
-                                        href={`upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Food Order')}&tr=${Date.now()}`}
+                                        href={`upi://pay?pa=${restaurantDetails?.upiId || import.meta.env.VITE_UPI_ID}&pn=${encodeURIComponent(restaurantDetails?.name || 'BiteStream')}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('BiteStream Order')}`}
                                         className="btn btn-primary"
                                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#1e90ff' }}
                                     >
                                         🚀 Open UPI App
                                     </a>
-                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Clicking above will open your installed UPI apps (GPay, PhonePe, etc.)</p>
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Note: If your bank app shows a limit error, please scan the QR code instead or enter the ID manually.</p>
                                 </div>
                                 <div className="input-group" style={{ textAlign: 'left' }}>
                                     <label className="input-label">Enter 12-Digit UTR / Ref Number</label>
