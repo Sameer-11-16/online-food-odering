@@ -65,7 +65,8 @@ const getUserActivity = async (req, res) => {
             targetId: order.restaurant._id,
             targetName: order.restaurant.name,
             image: order.restaurant.imageUrl,
-            date: order.deliveredAt
+            purchasedAt: order.createdAt,
+            deliveredAt: order.deliveredAt
         }));
 
         // Find restaurant reviews (already done)

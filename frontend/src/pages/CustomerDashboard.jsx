@@ -180,7 +180,10 @@ const CustomerDashboard = () => {
                                                 <div style={{ width: '50px', height: '50px', borderRadius: '10px', background: `url(${order.image ? (order.image.startsWith('http') ? order.image : API_BASE_URL + order.image) : ''}) center/cover`, backgroundColor: 'var(--glass-bg)' }} />
                                                 <div>
                                                     <h4 style={{ fontSize: '0.95rem', fontWeight: 800 }}>{order.targetName}</h4>
-                                                    <p style={{ fontSize: '0.75rem', opacity: 0.6 }}>Ordered on {new Date(order.date).toLocaleDateString()}</p>
+                                                    <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>
+                                                        <p>🛒 Purchased: {new Date(order.purchasedAt).toLocaleDateString()}</p>
+                                                        <p>✅ Delivered: {new Date(order.deliveredAt).toLocaleDateString()}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <button 
